@@ -16,10 +16,10 @@ const ProgressSchema = new mongoose.Schema(
       {
         sectionId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Section", // Mục tiêu (các chương hoặc bài học)
+          ref: "Section", 
         },
         progress: {
-          type: Number, // Tiến độ phần trăm (0-100)
+          type: Number, 
           default: 0,
         },
         completedAt: {
@@ -43,7 +43,7 @@ const ProgressSchema = new mongoose.Schema(
             },
             feedback: {
               type: String,
-              default: null, // Nhận xét của giáo viên
+              default: null, 
             },
           },
         ],
