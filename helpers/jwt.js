@@ -8,10 +8,14 @@ const generateAccessToken = (user) => {
   );
 };
 
-const generateRefreshToken = (userID) => {
-  return jwt.sign({ id: userID }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRY,
-  });
+const generateRefreshToken = (user) => {
+  return jwt.sign(
+    { id: user._id, email: user.email, role: user.role },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRY,
+    }
+  );
 };
 
 const verifyAccessToken = (token) => {

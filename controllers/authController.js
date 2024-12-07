@@ -6,6 +6,7 @@ import {
   verifyRefreshToken,
 } from "../helpers/jwt.js";
 import User from "../models/user.js";
+import { decode } from "jsonwebtoken";
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -52,7 +53,7 @@ const register = async (req, res) => {
 
     const accessToken = generateAccessToken(newUser);
 
-    const refreshToken = generateRefreshToken(newUser._id);
+    const refreshToken = generateRefreshToken(newUser);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -83,6 +84,8 @@ const refreshToken = async (req, res) => {
         return res.status(401).json({ message: "Invalid refresh token" });
       }
 
+      const { iat, exp, ...user } = decoded;
+
       const accessToken = generateAccessToken(user);
 
       res.status(200).json({
@@ -90,7 +93,7 @@ const refreshToken = async (req, res) => {
       });
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 
