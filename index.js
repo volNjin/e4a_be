@@ -1,0 +1,39 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import authRoutes from './routes/auth.js';
+
+dotenv.config(); // Load environment variables
+
+const app = express();
+
+// Middleware
+app.use(express.json()); // Parse JSON requests
+app.use(cors()); // Enable CORS for frontend integration
+
+// Database Connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+    process.exit(1); // Exit with failure
+  }
+};
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Default Route
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
+});
+
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, async () => {
+  await connectDB();
+  console.log(`Server running on port ${PORT}`);
+});
