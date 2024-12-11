@@ -5,10 +5,41 @@ class CourseService {
   // Get a list of all courses
   static async getAllCourses() {
     try {
-      const courses = await Course.find().populate("teacher", "name email");
+      const courses = await Course.aggregate([
+        {
+          $lookup: {
+            from: "sections",
+            localField: "_id",
+            foreignField: "course",
+            as: "sections",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "enrolledUsers",
+            foreignField: "_id",
+            as: "enrolledUsers",
+          },
+        },
+        {
+          $addFields: {
+            totalSections: { $size: "$sections" },
+            totalEnrolledUsers: { $size: "$enrolledUsers" },
+          },
+        },
+        {
+          $project: {
+            title: 1,
+            description: 1,
+            totalSections: 1,
+            totalEnrolledUsers: 1,
+          },
+        },
+      ]);
       return courses;
     } catch (error) {
-      throw new Error("Failed to fetch courses");
+      throw new Error("Failed to get courses with stats");
     }
   }
 

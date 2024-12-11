@@ -1,4 +1,4 @@
-import Section from "../models/sectionModel.js";
+import Section from "../models/Section.js";
 
 const sectionService = {
   // 1. Thêm một section mới

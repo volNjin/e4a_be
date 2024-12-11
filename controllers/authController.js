@@ -1,4 +1,4 @@
-import * as authService from '../services/authService.js';
+import * as authService from "../services/authService.js";
 
 const login = async (req, res) => {
   try {
@@ -9,9 +9,9 @@ const login = async (req, res) => {
       return res.status(result.status).json({ message: result.message });
     }
 
-    res.json(result.data);
+    res.status(200).json(result.data);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -26,7 +26,7 @@ const register = async (req, res) => {
 
     res.status(201).json(result.data);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -41,7 +41,7 @@ const refreshToken = async (req, res) => {
 
     res.status(200).json(result.data);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 
