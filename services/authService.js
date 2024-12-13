@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import Rftk from "../models/rftk.js";
 import { generateAccessToken, generateRefreshToken } from "../helpers/jwt.js";
 
 export const login = async (email, password) => {
