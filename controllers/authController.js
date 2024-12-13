@@ -9,7 +9,7 @@ const login = async (req, res) => {
       return res.status(result.status).json({ message: result.message });
     }
 
-    res.json(result.data);
+    res.status(200).json(result.data);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }

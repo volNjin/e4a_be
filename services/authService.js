@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
-import Rftk from "../models/rftk.js";
+import User from "../models/User.js";
+import Rftk from "../models/Rftk.js";
 import { generateAccessToken, generateRefreshToken } from "../helpers/jwt.js";
 
 export const login = async (email, password) => {
@@ -17,6 +17,7 @@ export const login = async (email, password) => {
     }
 
     const accessToken = generateAccessToken(user);
+    const refreshToken = Rftk.findOne({ userId: user._id });
 
     return {
       success: true,
@@ -26,6 +27,7 @@ export const login = async (email, password) => {
           email: user.email,
           role: user.role,
           accessToken,
+          refreshToken,
         },
       },
     };

@@ -47,8 +47,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import authRoutes from "./routes/auth.js";
-
+import authRoutes from "./routes/authRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
+import sectionRoutes from "./routes/sectionRoutes.js";
 dotenv.config(); // Load environment variables
 
 const app = express();
@@ -76,6 +77,8 @@ const connectDB = async () => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/sections", sectionRoutes);
 
 // Default Route
 app.get("/", (req, res) => {
