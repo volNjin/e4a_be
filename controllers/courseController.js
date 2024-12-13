@@ -21,14 +21,18 @@ export const getCourseById = async (req, res) => {
 
 export const createCourse = async (req, res) => {
   const { title, description, teacher } = req.body;
+  console.log({ title, description, teacher });
   try {
-    const course = await CourseService.createCourse(
+    const result = await CourseService.createCourse(
       title,
       description,
       teacher
     );
-    res.status(201).json({ success: true, data: course });
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+    res.status(201).json({ data: result.course });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };

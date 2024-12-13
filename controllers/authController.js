@@ -31,19 +31,6 @@ const register = async (req, res) => {
   }
 };
 
-const refreshToken = async (req, res) => {
-  try {
-    const { token } = req.body;
 
-    const result = await authService.refreshToken(token);
-    if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
-    }
 
-    res.status(200).json(result.data);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-};
-
-export { login, register, refreshToken };
+export { login, register };
