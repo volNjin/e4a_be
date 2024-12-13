@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
-import Rftk from "../models/rftk.js";
+import User from "../models/User.js";
+import Rftk from "../models/Rftk.js";
 import { generateAccessToken, generateRefreshToken } from "../helpers/jwt.js";
 
 export const login = async (email, password) => {
@@ -17,16 +17,17 @@ export const login = async (email, password) => {
     }
 
     const accessToken = generateAccessToken(user);
+    const refreshToken = Rftk.findOne({ userId: user._id });
 
     return {
       success: true,
       data: {
         user: {
-          id: user._id,
           name: user.name,
           email: user.email,
           role: user.role,
           accessToken,
+          refreshToken,
         },
       },
     };
@@ -60,6 +61,10 @@ export const register = async (name, email, password, role = "student") => {
     await newUser.save();
 
     const accessToken = generateAccessToken(newUser);
+    const refreshToken = generateRefreshToken(newUser);
+
+    const rftk = new Rftk({ userId: newUser._id, refreshToken });
+    await rftk.save();
 
     return {
       success: true,
@@ -72,9 +77,14 @@ export const register = async (name, email, password, role = "student") => {
           role: newUser.role,
         },
         accessToken,
+        refreshToken,
       },
     };
   } catch (error) {
     throw error;
   }
+};
+
+export const info = async () => {
+  return "oke";
 };
