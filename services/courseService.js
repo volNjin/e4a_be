@@ -1,4 +1,3 @@
-import { createCourseWithSection } from "../controllers/courseController.js";
 import Course from "../models/Course.js";
 
 class CourseService {
