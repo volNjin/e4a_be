@@ -8,7 +8,7 @@ const authenticate = (req, res, next) => {
   }
 
   try {
-    const decoded = verifyToken(token); // Xác thực token
+    const decoded = verifyAccessToken(token); // Xác thực token
     req.user = decoded; // Lưu thông tin người dùng vào req.user
     next(); // Tiếp tục xử lý yêu cầu
   } catch (error) {

@@ -1,4 +1,4 @@
-import Course from "../models/Course.js";
+import Course from "../models/course.js";
 
 class CourseService {
   // Get a list of all courses
