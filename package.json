@@ -12,6 +12,7 @@
   "type": "module",
   "devDependencies": {
     "compression": "^1.7.5",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0"
   }
 }

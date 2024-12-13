@@ -16,7 +16,7 @@ export const login = async (email, password) => {
     }
 
     const accessToken = generateAccessToken(user);
-
+ 
     return {
       success: true,
       data: {
@@ -26,6 +26,8 @@ export const login = async (email, password) => {
           email: user.email,
           role: user.role,
           accessToken,
+
+
         },
       },
     };
