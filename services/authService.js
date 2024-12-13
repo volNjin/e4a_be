@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
-import Rftk from "../models/Rftk.js";
+import User from "../models/user.js";
 import { generateAccessToken, generateRefreshToken } from "../helpers/jwt.js";
 
 export const login = async (email, password) => {
@@ -17,8 +16,7 @@ export const login = async (email, password) => {
     }
 
     const accessToken = generateAccessToken(user);
-    const rftk = await Rftk.findOne({ userId: user._id });
-
+ 
     return {
       success: true,
       data: {
@@ -28,7 +26,8 @@ export const login = async (email, password) => {
           email: user.email,
           role: user.role,
           accessToken,
-          refreshToken: rftk.refreshToken,
+
+
         },
       },
     };
@@ -62,10 +61,6 @@ export const register = async (name, email, password, role = "student") => {
     await newUser.save();
 
     const accessToken = generateAccessToken(newUser);
-    const refreshToken = generateRefreshToken(newUser);
-
-    const rftk = new Rftk({ userId: newUser._id, refreshToken });
-    await rftk.save();
 
     return {
       success: true,
@@ -78,37 +73,9 @@ export const register = async (name, email, password, role = "student") => {
           role: newUser.role,
         },
         accessToken,
-        refreshToken,
       },
     };
   } catch (error) {
-    throw error;
-  }
-};
-
-export const refreshToken = async (token) => {
-  try {
-    if (!token) {
-      return {
-        success: false,
-        status: 400,
-        message: "Refresh token is required",
-      };
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    const { iat, exp, ...user } = decoded;
-
-    const accessToken = generateAccessToken(user);
-
-    return {
-      success: true,
-      data: { accessToken },
-    };
-  } catch (error) {
-    if (error.name === "JsonWebTokenError") {
-      return { success: false, status: 401, message: "Invalid refresh token" };
-    }
     throw error;
   }
 };

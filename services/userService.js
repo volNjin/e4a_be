@@ -1,6 +1,8 @@
+
 import User from "../models/User.js";
 import { getInfoData } from "../utils/index.js";
 export const info = async (id) => {
+
   try {
     const user = await User.findById(id);
     if (!user) {
