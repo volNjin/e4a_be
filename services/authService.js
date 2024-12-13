@@ -17,17 +17,18 @@ export const login = async (email, password) => {
     }
 
     const accessToken = generateAccessToken(user);
-    const refreshToken = Rftk.findOne({ userId: user._id });
+    const rftk = await Rftk.findOne({ userId: user._id });
 
     return {
       success: true,
       data: {
         user: {
+          id: user._id,
           name: user.name,
           email: user.email,
           role: user.role,
           accessToken,
-          refreshToken,
+          refreshToken: rftk.refreshToken,
         },
       },
     };
