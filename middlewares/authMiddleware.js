@@ -11,7 +11,7 @@ const authenticate = (req, res, next) => {
   try {
     const decoded = verifyAccessToken(token);
     req.user = decoded;
-    console.log(decoded);
+    console.log(decoded)
     next();
   } catch (error) {
     return res.status(400).json({ message: "Invalid token" });

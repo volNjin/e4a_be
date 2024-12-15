@@ -4,9 +4,10 @@ import {
   getCourseById,
   createCourse,
 } from "../controllers/courseController.js";
+import authenticate from "../middlewares/authMiddleware.js";
 
 const courseRoutes = express.Router();
-
+courseRoutes.use(authenticate);
 // GET /api/courses - Get all courses
 courseRoutes.get("/", getAllCourses);
 

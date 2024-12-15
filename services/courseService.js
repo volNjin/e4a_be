@@ -2,9 +2,20 @@ import Course from "../models/course.js";
 import mongoose from "mongoose";
 class CourseService {
   // 1️⃣ Get a list of all courses
-  static async getAllCourses() {
+  static async getAllCourses(user) {
     try {
+      let matchCondition = {};
+
+      if (user.role === "admin") {
+        matchCondition = {}; // Admin can see all courses
+      } else if (user.role === "teacher") {
+        matchCondition = { teacher: user.userId }; // Teacher sees only their courses
+      } else if (user.role === "student") {
+        matchCondition = { enrolledUsers: user.userId }; // Student sees only enrolled courses
+      }
+
       const courses = await Course.aggregate([
+        { $match: matchCondition },
         {
           $lookup: {
             from: "sections",
@@ -31,8 +42,11 @@ class CourseService {
           $project: {
             title: 1,
             description: 1,
+            teacher: 1,
             totalSections: 1,
             totalEnrolledUsers: 1,
+            createdAt: 1,
+            updatedAt: 1,
           },
         },
       ]);
@@ -58,21 +72,23 @@ class CourseService {
   }
 
   // 3️⃣ Create a new course
-  static async createCourse(title, description, teacher) {
+  static async createCourse(title, description, teacherId) {
     try {
       // Check for required fields
-      if (!title || !description || !teacher) {
+      if (!title || !description || !teacherId) {
         return {
           success: false,
           status: 400,
           message: "All fields are required",
         };
       }
+      const teacherObjectId = new mongoose.Types.ObjectId(teacherId);
 
       // Check if the course already exists
       const existingCourse = await Course.findOne({
-        title: title,
-        teacher: teacher,
+        title,
+        description,
+        teacher: teacherObjectId,
       });
 
       if (existingCourse) {
@@ -82,12 +98,11 @@ class CourseService {
           message: "Course already created",
         };
       }
-      const teacherId = new mongoose.Types.ObjectId(teacher)
       // Create and save new course
       const newCourse = new Course({
         title,
         description,
-        teacher: teacherId,
+        teacher: teacherObjectId,
         sections: [], // Default empty sections
         enrolledUsers: [], // Default empty enrolled users
       });
@@ -95,7 +110,7 @@ class CourseService {
       await newCourse.save();
       return { success: true, course: newCourse };
     } catch (error) {
-      throw new Error("Failed to create course");
+      throw error;
     }
   }
 }
