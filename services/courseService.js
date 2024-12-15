@@ -1,15 +1,15 @@
 import Course from "../models/course.js";
-
+import mongoose from "mongoose";
 class CourseService {
-  // Get a list of all courses
+  // 1️⃣ Get a list of all courses
   static async getAllCourses() {
     try {
       const courses = await Course.aggregate([
         {
           $lookup: {
             from: "sections",
-            localField: "_id",
-            foreignField: "course",
+            localField: "sections",
+            foreignField: "_id",
             as: "sections",
           },
         },
@@ -38,11 +38,12 @@ class CourseService {
       ]);
       return courses;
     } catch (error) {
+      console.error("Error getting all courses: ", error);
       throw new Error("Failed to get courses with stats");
     }
   }
 
-  // Get details of a specific course by ID
+  // 2️⃣ Get details of a specific course by ID
   static async getCourseById(courseId) {
     try {
       const course = await Course.findById(courseId).populate(
@@ -56,8 +57,10 @@ class CourseService {
     }
   }
 
+  // 3️⃣ Create a new course
   static async createCourse(title, description, teacher) {
     try {
+      // Check for required fields
       if (!title || !description || !teacher) {
         return {
           success: false,
@@ -66,11 +69,12 @@ class CourseService {
         };
       }
 
+      // Check if the course already exists
       const existingCourse = await Course.findOne({
-        title,
-        description,
-        teacher,
+        title: title,
+        teacher: teacher,
       });
+
       if (existingCourse) {
         return {
           success: false,
@@ -78,12 +82,20 @@ class CourseService {
           message: "Course already created",
         };
       }
+      const teacherId = new mongoose.Types.ObjectId(teacher)
+      // Create and save new course
+      const newCourse = new Course({
+        title,
+        description,
+        teacher: teacherId,
+        sections: [], // Default empty sections
+        enrolledUsers: [], // Default empty enrolled users
+      });
 
-      const newCourse = new Course(title, description, teacher);
       await newCourse.save();
       return { success: true, course: newCourse };
     } catch (error) {
-      throw error;
+      throw new Error("Failed to create course");
     }
   }
 }

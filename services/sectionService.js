@@ -1,8 +1,8 @@
 import Section from "../models/section.js";
-
+import mongoose from "mongoose";
 const sectionService = {
   // 1. Thêm một section mới
-  async addSection(
+  async addSections(
     title,
     content,
     courseId,
@@ -12,10 +12,11 @@ const sectionService = {
     exercises = []
   ) {
     try {
+      const courseObjectId = new mongoose.Types.ObjectId(courseId)
       const newSection = new Section({
         title,
         content,
-        course: courseId,
+        course: courseObjectId,
         parent,
         order,
         videos,

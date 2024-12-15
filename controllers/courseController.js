@@ -28,6 +28,7 @@ export const createCourse = async (req, res) => {
       description,
       teacher
     );
+    console.log(result)
     if (!result.success) {
       return res.status(result.status).json({ message: result.message });
     }
