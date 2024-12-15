@@ -2,7 +2,7 @@ import Section from "../models/section.js";
 import mongoose from "mongoose";
 const sectionService = {
   // 1. Thêm một section mới
-  async addSections(
+  async addSection(
     title,
     content,
     courseId,

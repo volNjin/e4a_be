@@ -3,7 +3,6 @@ import CourseService from "../services/courseService.js";
 export const getAllCourses = async (req, res) => {
   try {
     const user = req.user;
-    console.log(user)
     const courses = await CourseService.getAllCourses(user);
     res.status(200).json({ data: courses });
   } catch (error) {
@@ -22,12 +21,13 @@ export const getCourseById = async (req, res) => {
 };
 
 export const createCourse = async (req, res) => {
-  const { title, description } = req.body;
-  const teacherId = req.user?.id; // Extract teacher ID from token
   try {
+    const { title, description, image } = req.body;
+    const teacherId = req.user?.id; // Extract teacher ID from token
     const result = await CourseService.createCourse(
       title,
       description,
+      image,
       teacherId
     );
     if (!result.success) {

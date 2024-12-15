@@ -72,7 +72,7 @@ class CourseService {
   }
 
   // 3️⃣ Create a new course
-  static async createCourse(title, description, teacherId) {
+  static async createCourse(title, description, image, teacherId) {
     try {
       // Check for required fields
       if (!title || !description || !teacherId) {
@@ -102,6 +102,7 @@ class CourseService {
       const newCourse = new Course({
         title,
         description,
+        image,
         teacher: teacherObjectId,
         sections: [], // Default empty sections
         enrolledUsers: [], // Default empty enrolled users
