@@ -11,7 +11,7 @@ class CourseService {
       } else if (user.role === "teacher") {
         matchCondition = { teacher: user.userId }; // Teacher sees only their courses
       } else if (user.role === "student") {
-        matchCondition = { enrolledUsers: user.userId }; // Student sees only enrolled courses
+        matchCondition = { enrolledUsers: { $in: [user.userId] } }; // Student sees only enrolled courses
       }
 
       const courses = await Course.aggregate([
