@@ -48,4 +48,7 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("User", UserSchema);
+// Sử dụng lại mô hình nếu đã tồn tại
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
+
+export default User;
