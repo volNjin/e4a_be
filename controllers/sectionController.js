@@ -2,24 +2,22 @@ import sectionService from "../services/sectionService.js";
 
 // 1. Thêm một section mới
 export const addSection = async (req, res) => {
-  const { title, content, courseId, parent, order, videos, exercises } =
-    req.body;
+  const { title, content, courseId, video } = req.body;
 
-  if (!title || !content || !courseId || !order) {
+  if (!title || !courseId) {
     return res
       .status(400)
-      .json({ message: "Title, content, courseId, and order are required" });
+      .json({ message: "Title, courseId, and order are required" });
   }
+  const nextSectionOrder = await sectionService.getNextSectionOrder(courseId);
 
   try {
     const newSection = await sectionService.addSection(
       title,
       content,
       courseId,
-      parent,
-      order,
-      videos,
-      exercises
+      nextSectionOrder,
+      video
     );
     return res.status(201).json({ success: true, section: newSection });
   } catch (error) {

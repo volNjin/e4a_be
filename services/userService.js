@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../models/user.js";
 import { getInfoData } from "../utils/index.js";
 const select = ["name", "email", "avatar", "createdAt"];
 export const info = async (id) => {

@@ -26,23 +26,32 @@ class CourseService {
         },
         {
           $lookup: {
-            from: "users",
+            from: "users", // Lookup for enrolled users
             localField: "enrolledUsers",
             foreignField: "_id",
             as: "enrolledUsers",
           },
         },
         {
+          $lookup: {
+            from: "users", // Lookup for teacher information
+            localField: "teacher",
+            foreignField: "_id",
+            as: "teacherInfo", // Join teacher's information
+          },
+        },
+        {
           $addFields: {
             totalSections: { $size: "$sections" },
             totalEnrolledUsers: { $size: "$enrolledUsers" },
+            teacher: { $arrayElemAt: ["$teacherInfo.name", 0] }, // Get only teacher's name
           },
         },
         {
           $project: {
             title: 1,
             description: 1,
-            teacher: 1,
+            teacher: 1, // Now the teacher field contains only the name
             totalSections: 1,
             totalEnrolledUsers: 1,
             createdAt: 1,
@@ -50,6 +59,7 @@ class CourseService {
           },
         },
       ]);
+
       return courses;
     } catch (error) {
       console.error("Error getting all courses: ", error);

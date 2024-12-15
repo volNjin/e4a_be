@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 const ExerciseSchema = new mongoose.Schema(
   {
-    video: { type: mongoose.Schema.Types.ObjectId, ref: "Video" }, // Video reference (optional)
     type: {
       type: String,
       enum: ["multiple-choice", "single-choice"], // Type of question
