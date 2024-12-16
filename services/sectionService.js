@@ -33,7 +33,8 @@ const sectionService = {
 
       const newVideo = new Video({ url: video, section: newSection._id });
       await newVideo.save();
-      newSection.video = newVideo._id;
+
+      newSection.video = newVideo.url;
       await newSection.save();
       // Find the course and add the new section to its sections array
       const course = await Course.findById(courseObjectId);
@@ -56,7 +57,8 @@ const sectionService = {
   // 2. Lấy tất cả sections của một course, có phân loại theo thứ tự
   async getSectionsByCourse(courseId) {
     try {
-      const sections = await Section.find({ course: courseId }).sort({
+      const courseObjectId = new mongoose.Types.ObjectId(courseId);
+      const sections = await Section.find({ course: courseObjectId }).sort({
         order: 1,
       }); // Sắp xếp theo thứ tự
       return sections;
@@ -77,41 +79,48 @@ const sectionService = {
   // },
 
   // 4. Cập nhật một section
-  async updateSection(sectionId, title, content, order, videos, exercises) {
+  async updateSection(sectionId, title, content, order, videoUrl) {
     try {
       const sectionToUpdate = await Section.findById(sectionId);
-
       if (!sectionToUpdate) {
         throw new Error("Section not found");
       }
 
-      const { course, oldOrder } = sectionToUpdate;
-
+      const course = sectionToUpdate.course;
+      const oldOrder = sectionToUpdate.order;
       if (oldOrder !== order) {
         // Nếu thứ tự thay đổi, cần cập nhật lại các Section khác trong khóa học
         if (oldOrder < order) {
           // Nếu oldOrder nhỏ hơn order, giảm thứ tự các Section có order lớn hơn
           await Section.updateMany(
-            { course, order: { $gt: oldOrder, $lt: order } },
+            { course, order: { $gt: oldOrder, $lte: order } },
             { $inc: { order: -1 } }
           );
         } else if (oldOrder > order) {
           // Nếu oldOrder lớn hơn order, tăng thứ tự các Section có order nhỏ hơn
           await Section.updateMany(
-            { course, order: { $lt: oldOrder, $gt: order } },
+            { course, order: { $lt: oldOrder, $gte: order } },
             { $inc: { order: 1 } }
           );
         }
       }
+
+      // Cập nhật thông tin video
+      const sectionObjectId = new mongoose.Types.ObjectId(sectionId);
+      const oldVideo = await Video.findOne({ section: sectionObjectId });
+      oldVideo.url = videoUrl;
+      await oldVideo.save();
+
       // Cập nhật thông tin của Section
       const updatedSection = await Section.findByIdAndUpdate(
         sectionId,
-        { title, content, order, videos, exercises },
+        { title, content, order, video: oldVideo._id },
         { new: true }
       );
 
       return updatedSection;
     } catch (error) {
+      console.log(error);
       throw new Error("Failed to update section");
     }
   },

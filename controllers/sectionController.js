@@ -42,12 +42,12 @@ export const getSectionsByCourse = async (req, res) => {
 // 3. Cập nhật thông tin của một section
 export const updateSection = async (req, res) => {
   const { sectionId } = req.params;
-  const { title, content, order, videos, exercises } = req.body;
+  const { title, content, order, video } = req.body;
 
-  if (!title && !content && !order && !videos && !exercises) {
+  if (!title && !content && !order && !video) {
     return res.status(400).json({
       message:
-        "At least one field (title, content, order, videos, exercises) is required for update",
+        "At least one field (title, content, order, video) is required for update",
     });
   }
 
@@ -57,8 +57,7 @@ export const updateSection = async (req, res) => {
       title,
       content,
       order,
-      videos,
-      exercises
+      video
     );
     if (!updatedSection) {
       return res.status(404).json({ message: "Section not found" });
