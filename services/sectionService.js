@@ -28,14 +28,9 @@ const sectionService = {
         content,
         course: courseObjectId,
         order,
+        video,
       });
 
-      await newSection.save();
-
-      const newVideo = new Video({ url: video, section: newSection._id });
-      await newVideo.save();
-
-      newSection.video = newVideo.url;
       await newSection.save();
       // Find the course and add the new section to its sections array
       const course = await Course.findById(courseObjectId);
