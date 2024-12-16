@@ -2,7 +2,7 @@ import Course from "../models/course.js";
 import mongoose from "mongoose";
 class CourseService {
   // 1️⃣ Get a list of all courses
-  static async getAllCourses(user) {
+  static async getAllCourses() {
     try {
       const courses = await Course.aggregate([
         {

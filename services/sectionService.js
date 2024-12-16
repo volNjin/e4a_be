@@ -60,7 +60,7 @@ const sectionService = {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
       const sections = await Section.find(
         { course: courseObjectId },
-        { _id: 1, title: 1 }
+        { _id: 1, title: 1, order: 1 }
       ).sort({
         order: 1,
       }); // Sắp xếp theo thứ tự

@@ -2,7 +2,7 @@ import CourseService from "../services/courseService.js";
 
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await CourseService.getAllCourses(user);
+    const courses = await CourseService.getAllCourses();
     res.status(200).json({ data: courses });
   } catch (error) {
     res.status(500).json({ message: error.message });
