@@ -106,7 +106,7 @@ const sectionService = {
   // },
 
   // 4. Cập nhật một section
-  async updateSection(sectionId, title, content, order, videoUrl) {
+  async updateSection(sectionId, title, content, order, video) {
     try {
       const sectionToUpdate = await Section.findById(sectionId);
       if (!sectionToUpdate) {
@@ -132,16 +132,10 @@ const sectionService = {
         }
       }
 
-      // Cập nhật thông tin video
-      const sectionObjectId = new mongoose.Types.ObjectId(sectionId);
-      const oldVideo = await Video.findOne({ section: sectionObjectId });
-      oldVideo.url = videoUrl;
-      await oldVideo.save();
-
       // Cập nhật thông tin của Section
       const updatedSection = await Section.findByIdAndUpdate(
         sectionId,
-        { title, content, order, video: oldVideo._id },
+        { title, content, order, video },
         { new: true }
       );
 
