@@ -73,6 +73,7 @@ const sectionService = {
   // 3. Lấy thông tin section theo id
   async getSection(sectionId) {
     try {
+      console.log(sectionId);
       const section = await Section.findById(sectionId);
       if (!section) {
         throw new Error("Section not found");

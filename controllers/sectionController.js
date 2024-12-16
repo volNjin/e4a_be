@@ -42,7 +42,7 @@ export const getSection = async (req, res)=>{
   const {sectionId} = req.params;
 
   try {
-    const sections = await sectionService.getSection(sectionId);
+    const section = await sectionService.getSection(sectionId);
     return res.status(200).json({ success: true, section });
   } catch (error) {
     console.error(error);
