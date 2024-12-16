@@ -2,22 +2,27 @@ import express from "express";
 import {
   addSection,
   getSectionsByCourse,
+  getSection, // New API for getting a single section's id and title
   updateSection,
   deleteSection,
 } from "../controllers/sectionController.js";
+import authenticate from "../middlewares/authMiddleware.js";
 
 const sectionRoutes = express.Router();
-
-// POST /api/sections - Add a new section
+sectionRoutes.use(authenticate);
+// 1️⃣ POST /api/sections - Add a new section
 sectionRoutes.post("/", addSection);
 
-// GET /api/sections/:courseId - Get all sections of a specific course
-sectionRoutes.get("/:courseId", getSectionsByCourse);
+// 2️⃣ GET /api/sections/course/:courseId - Get all sections (id, title) of a specific course
+sectionRoutes.get("/course/:courseId", getSectionsByCourse);
 
-// PUT /api/sections/:sectionId - Update a section by its ID
+// 3️⃣ GET /api/sections/:sectionId - Get the id and title of a specific section
+sectionRoutes.get("/:sectionId", getSection);
+
+// 4️⃣ PUT /api/sections/:sectionId - Update a section by its ID
 sectionRoutes.put("/:sectionId", updateSection);
 
-// DELETE /api/sections/:sectionId - Delete a section by its ID
+// 5️⃣ DELETE /api/sections/:sectionId - Delete a section by its ID
 sectionRoutes.delete("/:sectionId", deleteSection);
 
 export default sectionRoutes;

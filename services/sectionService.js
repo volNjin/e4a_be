@@ -58,12 +58,30 @@ const sectionService = {
   async getSectionsByCourse(courseId) {
     try {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
-      const sections = await Section.find({ course: courseObjectId }).sort({
+      const sections = await Section.find(
+        { course: courseObjectId },
+        { _id: 1, title: 1 }
+      ).sort({
         order: 1,
       }); // Sắp xếp theo thứ tự
       return sections;
     } catch (error) {
+      console.log(error);
       throw new Error("Failed to fetch sections");
+    }
+  },
+  // 3. Lấy thông tin section theo id
+  async getSection(sectionId) {
+    try {
+      const section = await Section.findById(sectionId);
+      if (!section) {
+        throw new Error("Section not found");
+      }
+
+      return section;
+    } catch (error) {
+      console.error("Error fetching section: ", error);
+      throw new Error("Failed to fetch section");
     }
   },
   // // 3. Lấy tất cả sections con của một section, có phân loại theo thứ tự
@@ -135,7 +153,6 @@ const sectionService = {
       }
 
       const { course, order } = sectionToDelete;
-
       // Xóa section
       await Section.findByIdAndDelete(sectionId);
 

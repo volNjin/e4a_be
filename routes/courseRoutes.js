@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllCourses,
+  getMyCourses,
   getCourseById,
   createCourse,
 } from "../controllers/courseController.js";
@@ -10,6 +11,9 @@ const courseRoutes = express.Router();
 courseRoutes.use(authenticate);
 // GET /api/courses - Get all courses
 courseRoutes.get("/", getAllCourses);
+
+// GET /api/courses/myCourses - Get all user's courses
+courseRoutes.get("/myCourses/", getMyCourses);
 
 // GET /api/courses/:id - Get a single course by ID
 courseRoutes.get("/:id", getCourseById);
