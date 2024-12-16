@@ -38,8 +38,24 @@ export const getSectionsByCourse = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-export const getSection = async (req, res)=>{
-  const {sectionId} = req.params;
+
+export const getSectionsByCourseAndOrder = async (req, res) => {
+  const { courseId, order } = req.body;
+
+  try {
+    const section = await sectionService.getSectionsByCourseAndOrder(
+      courseId,
+      order
+    );
+    return res.status(200).json({ success: true, section });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSection = async (req, res) => {
+  const { sectionId } = req.params;
 
   try {
     const section = await sectionService.getSection(sectionId);
@@ -48,7 +64,7 @@ export const getSection = async (req, res)=>{
     console.error(error);
     return res.status(500).json({ message: error.message });
   }
-}
+};
 // 3. Cập nhật thông tin của một section
 export const updateSection = async (req, res) => {
   const { sectionId } = req.params;

@@ -11,7 +11,7 @@ const SectionSchema = new mongoose.Schema(
       ref: "Course",
       required: true,
     },
-    video: { type: mongoose.Schema.Types.ObjectId, ref: "Video" },
+    video: { type: String },
   },
   { timestamps: true }
 );

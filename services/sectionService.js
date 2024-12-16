@@ -2,6 +2,7 @@ import Section from "../models/section.js";
 import Course from "../models/course.js";
 import Video from "../models/video.js";
 import mongoose from "mongoose";
+import { getSectionsByCourse } from "../controllers/sectionController.js";
 const sectionService = {
   async getNextSectionOrder(courseId) {
     try {
@@ -70,6 +71,18 @@ const sectionService = {
       throw new Error("Failed to fetch sections");
     }
   },
+
+  async getSectionsByCourseAndOrder(courseId, order) {
+    try {
+      const courseObjectId = new mongoose.Types.ObjectId(courseId);
+      const section = await Section.find({ course: courseObjectId, order });
+      return section;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to fetch section");
+    }
+  },
+
   // 3. Lấy thông tin section theo id
   async getSection(sectionId) {
     try {
