@@ -1,17 +1,9 @@
-import crypto from "crypto";
 import Otp from "../models/otp.js";
-const generateOtp = () => {
-  // Generate 3 random bytes
-  const randomBytes = crypto.randomBytes(3);
-  // Convert the bytes to an integer
-  const otp = randomBytes.readUIntBE(0, 3) % 1000000;
-  // Convert the integer to a string and pad it with leading zeros if necessary
-  return otp.toString().padStart(6, "0");
-};
+import { generateToken } from "../helpers/randomToken.js";
 const newOtp = async (email) => {
   // check otp exist
   try {
-    const otp = generateOtp();
+    const otp = generateToken();
     const expireAt = new Date();
     expireAt.setMinutes(expireAt.getMinutes() + 5);
     const newOTP = await Otp.updateOne(

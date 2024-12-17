@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import Otp from "../models/otp.js";
 import { generateAccessToken } from "../helpers/jwt.js";
-
+import { generateToken } from "../helpers/randomToken.js";
 export const login = async (email, password) => {
   try {
     const user = await User.findOne({ email });
@@ -34,9 +34,9 @@ export const login = async (email, password) => {
   }
 };
 
-export const register = async (name, email, password, role = "student") => {
+export const register = async (name, email, role = "student") => {
   try {
-    if (!name || !email || !password) {
+    if (!name || !email) {
       return {
         success: false,
         status: 400,
@@ -52,13 +52,11 @@ export const register = async (name, email, password, role = "student") => {
         message: "Email is already in use",
       };
     }
-
+    const password = generateToken();
     const hashedPassword = bcrypt.hashSync(password, 8);
     const newUser = new User({ name, email, password: hashedPassword, role });
 
     await newUser.save();
-
-    const accessToken = generateAccessToken(newUser);
 
     return {
       success: true,
@@ -66,11 +64,11 @@ export const register = async (name, email, password, role = "student") => {
         message: "User registered successfully",
         user: {
           id: newUser._id,
-          name: newUser.name,
-          email: newUser.email,
-          role: newUser.role,
+          name,
+          email,
+          password,
+          role,
         },
-        accessToken,
       },
     };
   } catch (error) {

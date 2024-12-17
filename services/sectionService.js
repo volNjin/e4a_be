@@ -68,7 +68,7 @@ const sectionService = {
   async getSectionByCourseAndOrder(courseId, order) {
     try {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
-      const section = await Section.find({ course: courseObjectId, order });
+      const section = await Section.findOne({ course: courseObjectId, order });
       return section;
     } catch (error) {
       console.log(error);
@@ -82,7 +82,7 @@ const sectionService = {
       console.log(sectionId);
       const section = await Section.findById(sectionId);
       if (!section) {
-        throw new Error("Section not found");
+        return { success: false, message: "Section not found" };
       }
 
       return section;
@@ -108,7 +108,7 @@ const sectionService = {
     try {
       const sectionToUpdate = await Section.findById(sectionId);
       if (!sectionToUpdate) {
-        throw new Error("Section not found");
+        return { success: false, message: "Section not found" };
       }
 
       const course = sectionToUpdate.course;
@@ -150,13 +150,16 @@ const sectionService = {
       const sectionToDelete = await Section.findById(sectionId);
 
       if (!sectionToDelete) {
-        throw new Error("Section not found");
+        return { success: false, message: "Section not found" };
       }
 
       const { course, order } = sectionToDelete;
       // Xóa section
       await Section.findByIdAndDelete(sectionId);
-
+      await Course.findByIdAndUpdate(
+        course,
+        { $pull: { sections: sectionId } } // Xóa sectionId khỏi trường `sections` của khóa học
+      );
       // Cập nhật lại thứ tự của các section còn lại
       await Section.updateMany(
         { course, order: { $gt: order } }, // Tìm các Section có thứ tự lớn hơn thứ tự của Section bị xóa
