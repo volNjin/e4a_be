@@ -1,4 +1,5 @@
 import * as authService from "../services/authService.js";
+import * as otpService from "../services/otpService.js";
 import mailService from "../services/mailService.js";
 const login = async (req, res) => {
   try {
@@ -41,4 +42,58 @@ const register = async (req, res) => {
   }
 };
 
-export { login, register };
+const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const otp = await otpService.newOtp(email);
+    console.log("OTP generated:", otp);
+    try {
+      await mailService.sendOtpEmail(email, otp);
+      console.log("Welcome email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending otp email:", emailError);
+      // Optional: You can choose to continue, log it, or notify an admin
+    }
+
+    res.status(200).json({ success: true, message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("Error during password reset request:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const message = await otpService.verifyOtp(email, otp);
+    res.status(200).json({ success: true, message });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Email and new password are required" });
+  }
+
+  try {
+    const message = await authService.resetPassword(email, newPassword);
+
+    res.status(200).json({ success: true, message });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export { login, register, requestPasswordReset, verifyOtp, resetPassword };

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import { generateAccessToken, generateRefreshToken } from "../helpers/jwt.js";
+import Otp from "../models/otp.js";
+import { generateAccessToken } from "../helpers/jwt.js";
 
 export const login = async (email, password) => {
   try {
@@ -75,5 +75,30 @@ export const register = async (name, email, password, role = "student") => {
     };
   } catch (error) {
     throw error;
+  }
+};
+
+export const resetPassword = async (email, newPassword) => {
+  try {
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password in the database
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { $set: { password: hashedPassword } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    // Delete the OTP after successful password reset
+    await Otp.deleteOne({ email });
+
+    return "Password reset successfully";
+  } catch (err) {
+    throw new Error(err.message);
   }
 };
