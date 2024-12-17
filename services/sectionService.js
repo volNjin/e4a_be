@@ -79,18 +79,32 @@ const sectionService = {
   // 3. Lấy thông tin section theo id
   async getSection(sectionId) {
     try {
-      console.log(sectionId);
-      const section = await Section.findById(sectionId);
+      // 🟢 1. Tìm kiếm Section
+      const section = await Section.findById(sectionId).populate(
+        "course",
+        "title"
+      );
       if (!section) {
         return { success: false, message: "Section not found" };
       }
 
-      return section;
+      // 🟢 2. Lấy ID của khóa học
+      const courseId = section.course._id;
+
+      // 🟢 3. Đếm số lượng section trong khóa học
+      const totalSections = await Section.countDocuments({ course: courseId });
+
+      // 🟢 4. Trả về thông tin section và tổng số section của khóa học
+      return {
+        section,
+        totalSections,
+      };
     } catch (error) {
       console.error("Error fetching section: ", error);
       throw new Error("Failed to fetch section");
     }
   },
+
   // // 3. Lấy tất cả sections con của một section, có phân loại theo thứ tự
   // async getSectionsByParent(parentId) {
   //   try {
