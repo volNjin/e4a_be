@@ -66,34 +66,42 @@ const requestPasswordReset = async (req, res) => {
   }
 };
 
-const verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
+// const verifyOtp = async (req, res) => {
+//   const { email, otp } = req.body;
 
-  try {
-    const message = await otpService.verifyOtp(email, otp);
-    res.status(200).json({ success: true, message });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
+//   try {
+//     const message = await otpService.verifyOtp(email, otp);
+//     res.status(200).json({ success: true, message });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
 
 const resetPassword = async (req, res) => {
-  const { email, newPassword } = req.body;
-
-  if (!email || !newPassword) {
-    return res
-      .status(400)
-      .json({ message: "Email and new password are required" });
-  }
-
   try {
-    const message = await authService.resetPassword(email, newPassword);
+    const { email, otp, newPassword } = req.body;
 
-    res.status(200).json({ success: true, message });
+    if (!email || !otp || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Email, otp and new password are required" });
+    }
+    const verificationResult = await otpService.verifyOtp(email, otp);
+    if (!verificationResult.success) {
+      return res.status(400).json({ message: verificationResult.message });
+    }
+    try {
+      const message = await authService.resetPassword(email, newPassword);
+
+      res.status(200).json({ success: true, message });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: error.message });
+    }
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: error.message });
+    console.error("Error during resetting password:", error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-export { login, register, requestPasswordReset, verifyOtp, resetPassword };
+export { login, register, requestPasswordReset, resetPassword };

@@ -3,7 +3,6 @@ import {
   register,
   login,
   requestPasswordReset,
-  verifyOtp,
   resetPassword,
 } from "../controllers/authController.js";
 
@@ -16,6 +15,5 @@ authRoutes.post("/register", register);
 authRoutes.post("/login", login);
 
 authRoutes.post("/request-password-reset", requestPasswordReset);
-authRoutes.post("/verify-otp", verifyOtp);
 authRoutes.post("/reset-password", resetPassword);
 export default authRoutes;

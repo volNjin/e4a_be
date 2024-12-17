@@ -48,7 +48,7 @@ const verifyOtp = async (email, otp) => {
     // Optionally, delete the OTP to prevent reuse (for better security)
     await Otp.deleteOne({ email: email, otp: otp });
 
-    return "OTP verification successful";
+    return { success: true, message: "Otp verification successful" };
   } catch (err) {
     throw new Error(err.message);
   }
