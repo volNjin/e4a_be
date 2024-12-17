@@ -63,7 +63,7 @@ const changePassword = async (req, res) => {
       console.error("Error sending change password notification:", emailError);
       // Optional: You can choose to continue, log it, or notify an admin
     }
-    res.status(200).json({ message: "Đổi mật khẩu thành công!" });
+    res.status(200).json({ message: "Change password successfully!" });
   } catch (error) {
     console.error("Failed to change password:", error);
     res.status(500).json({ message: "Internal server error: ", error });

@@ -37,12 +37,12 @@ const verifyOtp = async (email, otp) => {
 
     // Check if OTP exists
     if (!otpRecord) {
-      throw new Error("Invalid OTP");
+      return { success: false, message: "Invalid OTP" };
     }
 
     // Check if the OTP has expired
     if (new Date() > otpRecord.expireAt) {
-      throw new Error("OTP has expired");
+      return { success: false, message: "OTP has expired" };
     }
 
     // Optionally, delete the OTP to prevent reuse (for better security)

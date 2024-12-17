@@ -90,14 +90,10 @@ export const resetPassword = async (email, newPassword) => {
       { new: true }
     );
 
-    if (!updatedUser) {
-      throw new Error("User not found");
-    }
-
     // Delete the OTP after successful password reset
     await Otp.deleteOne({ email });
 
-    return "Password reset successfully";
+    return { success: true };
   } catch (err) {
     throw new Error(err.message);
   }

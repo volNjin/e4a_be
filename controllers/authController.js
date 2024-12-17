@@ -9,7 +9,7 @@ const login = async (req, res) => {
       return res.status(result.status).json({ message: result.message });
     }
 
-    res.status(200).json(result.data);
+    res.status(200).json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
@@ -35,7 +35,7 @@ const register = async (req, res) => {
     }
 
     // Step 3: Return a response to the client
-    res.status(201).json(result.data);
+    res.status(201).json({ success: true, data: result.data });
   } catch (error) {
     console.error("Error during registration:", error);
     res.status(500).json({ message: "Internal server error", error });
@@ -93,7 +93,9 @@ const resetPassword = async (req, res) => {
     try {
       const message = await authService.resetPassword(email, newPassword);
 
-      res.status(200).json({ success: true, message });
+      res
+        .status(200)
+        .json({ success: true, message: "Password reset successfully" });
     } catch (error) {
       console.log(error);
       res.status(400).json({ message: error.message });
