@@ -4,6 +4,7 @@ import {
   getMyCourses,
   getCourseById,
   createCourse,
+  getEnrolledUsers,
 } from "../controllers/courseController.js";
 import authenticate from "../middlewares/authMiddleware.js";
 
@@ -20,5 +21,7 @@ courseRoutes.get("/:id", getCourseById);
 
 // POST /api/courses - Create a new course
 courseRoutes.post("/", createCourse);
+
+courseRoutes.get("/enroll-users/:courseId", getEnrolledUsers);
 
 export default courseRoutes;

@@ -97,7 +97,7 @@ const createUser = async (req, res) => {
     }
 
     // Step 3: Return a response to the client
-    res.status(201).json({ success: true, message: result.data.message});
+    res.status(201).json({ success: true, message: result.data.message });
   } catch (error) {
     console.error("Error during registration:", error);
     res.status(500).json({ message: "Internal server error", error });
@@ -179,6 +179,25 @@ const createUserBatch = async (req, res) => {
   }
 };
 
+const enrollCourse = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { courseId } = req.params;
+
+    const result = await userService.enrollCourse(userId, courseId);
+
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Enrolled successfully", data: result.data });
+  } catch (error) {
+    console.error("Error enrolling course:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
 export {
   info,
   getAll,
@@ -186,4 +205,5 @@ export {
   changePassword,
   createUser,
   createUserBatch,
+  enrollCourse,
 };

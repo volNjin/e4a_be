@@ -174,6 +174,28 @@ class CourseService {
       throw error;
     }
   }
+
+  static async getEnrolledUsers(courseId) {
+    try {
+      // Step 1: Find the course by its ID and get the enrolledUsers list
+      const course = await Course.findById(courseId).populate(
+        "enrolledUsers",
+        "name email avatar"
+      );
+
+      if (!course) {
+        return { success: false, status: 404, message: "Course not found" };
+      }
+
+      // Step 2: Return the list of enrolled users
+      const enrolledUsers = course.enrolledUsers;
+
+      return { success: true, data: enrolledUsers };
+    } catch (error) {
+      console.error("Error fetching enrolled users:", error);
+      throw new Error("Failed to fetch enrolled users");
+    }
+  }
 }
 
 export default CourseService;

@@ -47,3 +47,16 @@ export const createCourse = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getEnrolledUsers = async (req, res) => {
+  try {
+    const {courseId} = req.params;
+    const result = await CourseService.getEnrolledUsers(courseId);
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+    res.status(201).json({ success: true, users: result.data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

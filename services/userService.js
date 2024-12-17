@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import Course from "../models/course.js";
 import { getInfoData } from "../utils/index.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../helpers/randomToken.js";
@@ -125,5 +126,59 @@ export const createUser = async (name, email, role = "student") => {
     };
   } catch (error) {
     throw error;
+  }
+};
+
+export const enrollCourse = async (userId, courseId) => {
+  try {
+    // Check if the user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return { success: false, status: 404, message: "User not found" };
+    }
+
+    // Initialize user.enrolledCourses if it's null
+    if (!Array.isArray(user.enrolledCourses)) {
+      user.enrolledCourses = [];
+    }
+
+    // Check if the course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return { success: false, status: 404, message: "Course not found" };
+    }
+
+    // Initialize course.enrolledUsers if it's null
+    if (!Array.isArray(course.enrolledUsers)) {
+      course.enrolledUsers = [];
+    }
+
+    // Check if the user is already enrolled in the course
+    const isAlreadyEnrolled = user.enrolledCourses.some(
+      (enrolled) => enrolled.courseId.toString() === courseId
+    );
+
+    if (isAlreadyEnrolled) {
+      return {
+        success: false,
+        status: 400,
+        message: "User is already enrolled in this course",
+      };
+    }
+
+    // Add course to user's enrolled courses
+    user.enrolledCourses.push({ courseId });
+    await user.save();
+
+    // Optionally, add the user to the course's enrolled users
+    if (!course.enrolledUsers.includes(userId)) {
+      course.enrolledUsers.push(userId);
+      await course.save();
+    }
+
+    return { success: true, data: { user, course } };
+  } catch (error) {
+    console.error("Error enrolling user to course:", error);
+    throw new Error("Failed to enroll user in course");
   }
 };
