@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import Otp from "../models/otp.js";
 import { generateAccessToken } from "../helpers/jwt.js";
-import { generateToken } from "../helpers/randomToken.js";
 export const login = async (email, password) => {
   try {
     const user = await User.findOne({ email });
@@ -26,48 +25,6 @@ export const login = async (email, password) => {
           email: user.email,
           role: user.role,
           accessToken,
-        },
-      },
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const register = async (name, email, role = "student") => {
-  try {
-    if (!name || !email) {
-      return {
-        success: false,
-        status: 400,
-        message: "All fields are required",
-      };
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return {
-        success: false,
-        status: 400,
-        message: "Email is already in use",
-      };
-    }
-    const password = generateToken();
-    const hashedPassword = bcrypt.hashSync(password, 8);
-    const newUser = new User({ name, email, password: hashedPassword, role });
-
-    await newUser.save();
-
-    return {
-      success: true,
-      data: {
-        message: "User registered successfully",
-        user: {
-          id: newUser._id,
-          name,
-          email,
-          password,
-          role,
         },
       },
     };

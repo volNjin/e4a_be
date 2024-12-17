@@ -4,12 +4,16 @@ import {
   getUserById,
   info,
   changePassword,
+  createUser,
+  createUserBatch,
 } from "../controllers/userController.js";
 import authenticate from "../middlewares/authMiddleware.js";
 const userRoutes = express.Router();
 
 userRoutes.use(authenticate);
 
+userRoutes.post("/create-user", createUser);
+userRoutes.post("/create-user-batch", createUserBatch);
 userRoutes.get("/info", info);
 userRoutes.get("/get-all", getAll);
 userRoutes.get("/get-user-by-id", getUserById);
