@@ -39,11 +39,11 @@ export const getSectionsByCourse = async (req, res) => {
   }
 };
 
-export const getSectionsByCourseAndOrder = async (req, res) => {
+export const getSectionByCourseAndOrder = async (req, res) => {
   const { courseId, order } = req.body;
 
   try {
-    const section = await sectionService.getSectionsByCourseAndOrder(
+    const section = await sectionService.getSectionByCourseAndOrder(
       courseId,
       order
     );

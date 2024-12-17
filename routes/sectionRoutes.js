@@ -2,10 +2,10 @@ import express from "express";
 import {
   addSection,
   getSectionsByCourse,
-  getSection, // New API for getting a single section's id and title
+  getSection,
   updateSection,
   deleteSection,
-  getSectionsByCourseAndOrder,
+  getSectionByCourseAndOrder,
 } from "../controllers/sectionController.js";
 import authenticate from "../middlewares/authMiddleware.js";
 
@@ -17,7 +17,7 @@ sectionRoutes.post("/", addSection);
 // 2️⃣ GET /api/sections/course/:courseId - Get all sections (id, title) of a specific course
 sectionRoutes.get("/course/:courseId", getSectionsByCourse);
 
-sectionRoutes.get("/course-and-order/", getSectionsByCourseAndOrder);
+sectionRoutes.post("/course-and-order/", getSectionByCourseAndOrder);
 
 // 3️⃣ GET /api/sections/:sectionId - Get the id and title of a specific section
 sectionRoutes.get("/:sectionId", getSection);

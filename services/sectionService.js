@@ -1,8 +1,6 @@
 import Section from "../models/section.js";
 import Course from "../models/course.js";
-import Video from "../models/video.js";
 import mongoose from "mongoose";
-import { getSectionsByCourse } from "../controllers/sectionController.js";
 const sectionService = {
   async getNextSectionOrder(courseId) {
     try {
@@ -67,7 +65,7 @@ const sectionService = {
     }
   },
 
-  async getSectionsByCourseAndOrder(courseId, order) {
+  async getSectionByCourseAndOrder(courseId, order) {
     try {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
       const section = await Section.find({ course: courseObjectId, order });
