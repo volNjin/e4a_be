@@ -17,7 +17,7 @@ sectionRoutes.post("/", addSection);
 // 2️⃣ GET /api/sections/course/:courseId - Get all sections (id, title) of a specific course
 sectionRoutes.get("/course/:courseId", getSectionsByCourse);
 
-sectionRoutes.post("/course-and-order/", getSectionByCourseAndOrder);
+sectionRoutes.post("/course-and-order", getSectionByCourseAndOrder);
 
 // 3️⃣ GET /api/sections/:sectionId - Get the id and title of a specific section
 sectionRoutes.get("/:sectionId", getSection);

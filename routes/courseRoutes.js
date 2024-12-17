@@ -13,7 +13,7 @@ courseRoutes.use(authenticate);
 courseRoutes.get("/", getAllCourses);
 
 // GET /api/courses/myCourses - Get all user's courses
-courseRoutes.get("/my-courses/", getMyCourses);
+courseRoutes.get("/my-courses", getMyCourses);
 
 // GET /api/courses/:id - Get a single course by ID
 courseRoutes.get("/:id", getCourseById);
