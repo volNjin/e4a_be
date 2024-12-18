@@ -24,6 +24,7 @@ export const info = async (id) => {
     throw error;
   }
 };
+
 export const getAllUser = async () => {
   try {
     const result = await User.find({}, select);

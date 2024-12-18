@@ -88,7 +88,7 @@ const createUser = async (req, res) => {
 
     // Step 2: Send welcome email to the user
     try {
-      const password = result.data.password;
+      const password = result.data.user.password;
       await mailService.sendWelcomeEmail(email, name, password);
       console.log("Welcome email sent successfully");
     } catch (emailError) {
