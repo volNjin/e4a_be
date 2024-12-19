@@ -1,6 +1,7 @@
 import Course from "../models/course.js";
 import mongoose from "mongoose";
-class CourseService {
+import section from "../models/section.js";
+class courseService {
   // 1️⃣ Get a list of all courses
   static async getAllCourses() {
     try {
@@ -175,6 +176,20 @@ class CourseService {
     }
   }
 
+  static async deleteCourse(courseId) {
+    try {
+      const course = await Course.findByIdAndDelete(courseId);
+      if (!course) {
+        return { success: false, status: 404, message: "Course not found" };
+      }
+      await section.deleteMany({ course: courseId });
+
+      return { success: true, message: "Course deleted successfully" };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getEnrolledUsers(courseId) {
     try {
       // Step 1: Find the course by its ID and get the enrolledUsers list
@@ -198,4 +213,4 @@ class CourseService {
   }
 }
 
-export default CourseService;
+export default courseService;

@@ -88,7 +88,7 @@ const createUser = async (req, res) => {
 
     // Step 2: Send welcome email to the user
     try {
-      const password = result.data.password;
+      const password = result.data.user.password;
       await mailService.sendWelcomeEmail(email, name, password);
       console.log("Welcome email sent successfully");
     } catch (emailError) {
@@ -149,7 +149,7 @@ const createUserBatch = async (req, res) => {
 
         // 🟢 Step 2: Gửi email chào mừng cho người dùng
         try {
-          const password = result.data.password;
+          const password = result.data.user.password;
           await mailService.sendWelcomeEmail(email, name, password);
           console.log(`Welcome email sent successfully to ${email}`);
         } catch (emailError) {
@@ -175,6 +175,77 @@ const createUserBatch = async (req, res) => {
     res.status(201).json({ success: true, results });
   } catch (error) {
     console.error("Error during batch registration:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+const updateUser = async (req,res) => {
+  try{
+    const userId = req.user?.id;
+    const updateStats = req.body;
+    const updatedUser = await userService.updateUser(userId, updateStats);
+    res.status(200).json({success: true, updatedUser});
+  } catch(error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const userRole = req.user?.role;
+    if (userRole !== "admin" && userRole !== "teacher") {
+      return res
+        .status(400)
+        .json({ message: "User do not have permission to use this function" });
+    }
+    const { id } = req.params;
+    console.log(id)
+    const result = await userService.deleteUser(id);
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+const deleteUserBatch = async (req, res) => {
+  try {
+    const userRole = req.user?.role;
+    if (userRole !== "admin" && userRole !== "teacher") {
+      return res
+        .status(400)
+        .json({ message: "User do not have permission to use this function" });
+    }
+    const toDeleteUsers = req.body; // Mảng id người dùng
+    if (!Array.isArray(toDeleteUsers) || toDeleteUsers.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Invalid input. Expected an array of user IDs." });
+    }
+    const results = [];
+    for (const userId of toDeleteUsers) {
+      const result = await userService.deleteUser(userId);
+      if (!result.success) {
+        results.push({
+          userId,
+          success: false,
+          message: result.message || "Failed to delete user.",
+        });
+        continue;
+      }
+      results.push({
+        userId,
+        success: true,
+        message: "User deleted successfully.",
+      });
+    }
+    res.status(200).json({ success: true, results });
+  } catch (error) {
+    console.error("Error deleting users:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -205,5 +276,8 @@ export {
   changePassword,
   createUser,
   createUserBatch,
+  updateUser,
+  deleteUser,
+  deleteUserBatch,
   enrollCourse,
 };

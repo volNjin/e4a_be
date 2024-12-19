@@ -129,6 +129,36 @@ export const createUser = async (name, email, role = "student") => {
   }
 };
 
+export const updatedUser = async (userId, userStats) => {
+  try {
+    const user = await User.findByIdAndUpdate(userId, userStats, { new: true });
+    if (!user) {
+      return { success: false, status: 404, message: "User not found" };
+    }
+    return { success: true, message: "User updated successfully", user };
+  } catch (error) {
+    throw error;
+  }
+  ss;
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return { success: false, status: 404, message: "User not found" };
+    }
+    // Remove the user's enrolled courses from the courses they are enrolled in\
+    await Course.updateMany(
+      { enrolledUsers: userId }, // Find courses where the user is enrolled
+      { $pull: { enrolledUsers: userId } } // Remove the user from the array
+    );
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const enrollCourse = async (userId, courseId) => {
   try {
     // Check if the user exists
