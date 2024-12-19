@@ -1,6 +1,6 @@
 import Course from "../models/course.js";
 import mongoose from "mongoose";
-import section from "../models/section.js";
+import Section from "../models/section.js";
 class courseService {
   // 1️⃣ Get a list of all courses
   static async getAllCourses() {
@@ -125,7 +125,7 @@ class courseService {
         "teacher",
         "name email"
       );
-      if (!course) throw new Error("Course not found");
+      if (!course) return { message: "Course not found" };
       return course;
     } catch (error) {
       throw new Error("Failed to fetch course");
@@ -182,7 +182,7 @@ class courseService {
       if (!course) {
         return { success: false, status: 404, message: "Course not found" };
       }
-      await section.deleteMany({ course: courseId });
+      await Section.deleteMany({ course: courseId });
 
       return { success: true, message: "Course deleted successfully" };
     } catch (error) {
