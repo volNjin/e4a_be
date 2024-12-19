@@ -59,6 +59,9 @@ export const getSection = async (req, res) => {
 
   try {
     const data = await sectionService.getSection(sectionId);
+    if (!data) {
+      return res.status(404).json({ message: "Section not found" });
+    }
     return res.status(200).json({ success: true, data });
   } catch (error) {
     console.error(error);
