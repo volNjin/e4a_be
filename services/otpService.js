@@ -1,4 +1,4 @@
-import Otp from "../models/otp.js";
+import Otp from "../models/Otp.js";
 import { generateToken } from "../helpers/randomToken.js";
 const newOtp = async (email) => {
   // check otp exist
