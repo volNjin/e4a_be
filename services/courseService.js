@@ -1,6 +1,6 @@
-import Course from "../models/course.js";
+import Course from "../models/Course.js";
 import mongoose from "mongoose";
-import Section from "../models/section.js";
+import Section from "../models/Section.js";
 class courseService {
   // 1️⃣ Get a list of all courses
   static async getAllCourses() {

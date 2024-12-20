@@ -1,5 +1,5 @@
-import Section from "../models/section.js";
-import Course from "../models/course.js";
+import Section from "../models/Section.js";
+import Course from "../models/Course.js";
 import mongoose from "mongoose";
 const sectionService = {
   async getNextSectionOrder(courseId) {

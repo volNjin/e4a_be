@@ -1,5 +1,5 @@
-import User from "../models/user.js";
-import Course from "../models/course.js";
+import User from "../models/User.js";
+import Course from "../models/Course.js";
 import { getInfoData } from "../utils/index.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../helpers/randomToken.js";

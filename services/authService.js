@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import User from "../models/user.js";
-import Otp from "../models/otp.js";
+import User from "../models/User.js";
+import Otp from "../models/Otp.js";
 import { generateAccessToken } from "../helpers/jwt.js";
 export const login = async (email, password) => {
   try {
