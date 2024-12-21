@@ -1,36 +1,92 @@
 import * as userService from "../services/userService.js";
 import mailService from "../services/mailService.js";
+import courseService from "../services/courseService.js";
 const info = async (req, res) => {
   try {
     const result = await userService.info(req.user.id);
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
     res.status(200).json(result.data);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
 const getUserById = async (req, res) => {
   try {
     const result = await userService.info(req.query.id);
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
     res.status(200).json(result.data);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
+
 const getAll = async (req, res) => {
   try {
-    const result = await userService.getAllUser();
-    if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+    // Lấy filters từ query parameters
+    console.log(req.query);
+    const filters = {
+      name: req.query?.name,
+      email: req.query?.email,
+      courseId: req.query?.courseId,
+    };
+
+    const requestingUser = req.user; // Lấy user từ middleware
+    console.log(requestingUser);
+    let query = {};
+
+    if (requestingUser.role === "admin") {
+      // Admin có thể xem tất cả user
+      query = {
+        ...filters,
+      };
+    } else if (requestingUser.role === "teacher") {
+      const courses = await courseService.getMyCourses(requestingUser);
+      const courseIds = courses.map((course) => course._id);
+      // Teacher chỉ xem student trong các khóa học của họ
+      query = {
+        role: "student",
+        "enrolledCourses.courseId": { $in: courseIds },
+        ...filters,
+      };
+    } else {
+      // Các role khác không được phép truy cập
+      return res.status(400).json({
+        success: false,
+        message: "User do not have permission to use this function",
+      });
     }
-    res.status(200).json(result.data);
+    // Gọi service để lấy danh sách user
+    const users = await userService.getAllUsers(query);
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No users found matching the criteria",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -51,7 +107,9 @@ const changePassword = async (req, res) => {
       newPassword
     );
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
     try {
       await mailService.changePasswordNotification(
@@ -66,7 +124,9 @@ const changePassword = async (req, res) => {
     res.status(200).json({ message: "Change password successfully!" });
   } catch (error) {
     console.error("Failed to change password:", error);
-    res.status(500).json({ message: "Internal server error: ", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error: ", error });
   }
 };
 
@@ -83,7 +143,9 @@ const createUser = async (req, res) => {
     // Step 1: Call the userService to create the user
     const result = await userService.createUser(name, email, role);
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
 
     // Step 2: Send welcome email to the user
@@ -100,7 +162,9 @@ const createUser = async (req, res) => {
     res.status(201).json({ success: true, message: result.data.message });
   } catch (error) {
     console.error("Error during registration:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
 
@@ -175,19 +239,23 @@ const createUserBatch = async (req, res) => {
     res.status(201).json({ success: true, results });
   } catch (error) {
     console.error("Error during batch registration:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
 
-const updateUser = async (req,res) => {
-  try{
+const updateUser = async (req, res) => {
+  try {
     const userId = req.user?.id;
     const updateStats = req.body;
     const updatedUser = await userService.updateUser(userId, updateStats);
-    res.status(200).json({success: true, updatedUser});
-  } catch(error) {
+    res.status(200).json({ success: true, updatedUser });
+  } catch (error) {
     console.error("Error updating user:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
 
@@ -200,15 +268,21 @@ const deleteUser = async (req, res) => {
         .json({ message: "User do not have permission to use this function" });
     }
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
     const result = await userService.deleteUser(id);
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
-    res.status(200).json({ message: "User deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
 
@@ -246,7 +320,9 @@ const deleteUserBatch = async (req, res) => {
     res.status(200).json({ success: true, results });
   } catch (error) {
     console.error("Error deleting users:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
 
@@ -258,17 +334,33 @@ const enrollCourse = async (req, res) => {
     const result = await userService.enrollCourse(userId, courseId);
 
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
 
-    res
-      .status(200)
-      .json({ message: "Enrolled successfully", data: result.data });
+    try {
+      await progressService.initProgress(userId, courseId);
+    } catch (error) {
+      console.error("Error initializing progress for enrolled user:", error);
+      return res
+        .status(404)
+        .json({ success: false, message: "Internal server error", error });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Enrolled successfully",
+      data: result.data,
+    });
   } catch (error) {
     console.error("Error enrolling course:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(404)
+      .json({ success: false, message: "Internal server error", error });
   }
 };
+
 export {
   info,
   getAll,

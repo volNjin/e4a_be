@@ -25,18 +25,23 @@ export const info = async (id) => {
   }
 };
 
-export const getAllUser = async () => {
+export const getAllUsers = async (filters) => {
   try {
-    const result = await User.find({}, select);
-    if (!result) {
-      return { success: false, status: 400, message: "Invalid credentials" };
+    // Tạo query từ filters
+    const query = {};
+    if (filters.name) {
+      query.name = { $regex: filters.name, $options: "i" }; // Tìm kiếm không phân biệt hoa thường
     }
-    return {
-      success: true,
-      data: {
-        result: result,
-      },
-    };
+    if (filters.email) {
+      query.email = { $regex: filters.email, $options: "i" }; // Tìm kiếm không phân biệt hoa thường
+    }
+    if (filters.courseId) {
+      query["enrolledCourses.courseId"] = filters.courseId; // Tìm kiếm theo courseId
+    }
+    // Truy vấn với populate để lấy thông tin khóa học
+    const users = await User.find(query).select("-password");
+
+    return users;
   } catch (error) {
     throw error;
   }

@@ -29,6 +29,19 @@ export const getCourseById = async (req, res) => {
   }
 };
 
+export const getEnrolledUsers = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const result = await courseService.getEnrolledUsers(courseId);
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+    res.status(201).json({ success: true, enrolledUsers: result.data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const createCourse = async (req, res) => {
   try {
     const { title, description, image } = req.body;
@@ -48,18 +61,19 @@ export const createCourse = async (req, res) => {
   }
 };
 
-export const getEnrolledUsers = async (req, res) => {
+export const updateCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const result = await courseService.getEnrolledUsers(courseId);
+    const { title, description, image } = req.body;
+    const result = await courseService.updateCourse(courseId, title, description, image);
     if (!result.success) {
       return res.status(result.status).json({ message: result.message });
     }
-    res.status(201).json({ success: true, enrolledUsers: result.data });
+    res.status(200).json({ success: true, data: result.course });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
+}
 
 export const deleteCourse = async (req, res) => {
   try {

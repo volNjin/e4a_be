@@ -3,9 +3,10 @@ import {
   getAllCourses,
   getMyCourses,
   getCourseById,
-  createCourse,
-  deleteCourse,
   getEnrolledUsers,
+  createCourse,
+  updateCourse,
+  deleteCourse,
 } from "../controllers/courseController.js";
 import authenticate from "../middlewares/authMiddleware.js";
 
@@ -20,9 +21,13 @@ courseRoutes.get("/my-courses", getMyCourses);
 // GET /api/courses/:id - Get a single course by ID
 courseRoutes.get("/:id", getCourseById);
 
+courseRoutes.get("/enroll-users/:courseId", getEnrolledUsers);
+
 // POST /api/courses - Create a new course
 courseRoutes.post("/", createCourse);
+
+courseRoutes.put("/:courseId", updateCourse);
+
 courseRoutes.delete("/:id", deleteCourse);
-courseRoutes.get("/enroll-users/:courseId", getEnrolledUsers);
 
 export default courseRoutes;

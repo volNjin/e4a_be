@@ -7,7 +7,9 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const result = await authService.login(email, password);
     if (!result.success) {
-      return res.status(result.status).json({ message: result.message });
+      return res
+        .status(result.status)
+        .json({ success: false, message: result.message });
     }
 
     res.status(200).json({ success: true, data: result.data });
@@ -20,7 +22,9 @@ const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
     }
 
     const otp = await otpService.newOtp(email);
@@ -60,7 +64,9 @@ const resetPassword = async (req, res) => {
     }
     const verificationResult = await otpService.verifyOtp(email, otp);
     if (!verificationResult.success) {
-      return res.status(400).json({ message: verificationResult.message });
+      return res
+        .status(400)
+        .json({ success: false, message: verificationResult.message });
     }
     try {
       const newPassword = generateToken();
@@ -76,7 +82,10 @@ const resetPassword = async (req, res) => {
         );
         console.log(`Reset password email sent successfully to ${email}`);
       } catch (emailError) {
-        console.error(`Error sending reset password email to ${email}:`, emailError);
+        console.error(
+          `Error sending reset password email to ${email}:`,
+          emailError
+        );
       }
       res
         .status(200)

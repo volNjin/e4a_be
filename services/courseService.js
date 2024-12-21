@@ -132,6 +132,28 @@ class courseService {
     }
   }
 
+  static async getEnrolledUsers(courseId) {
+    try {
+      // Step 1: Find the course by its ID and get the enrolledUsers list
+      const course = await Course.findById(courseId).populate(
+        "enrolledUsers",
+        "name email avatar"
+      );
+
+      if (!course) {
+        return { success: false, status: 404, message: "Course not found" };
+      }
+
+      // Step 2: Return the list of enrolled users
+      const enrolledUsers = course.enrolledUsers;
+
+      return { success: true, data: enrolledUsers };
+    } catch (error) {
+      console.error("Error fetching enrolled users:", error);
+      throw new Error("Failed to fetch enrolled users");
+    }
+  }
+
   // 3️⃣ Create a new course
   static async createCourse(title, description, image, teacherId) {
     try {
@@ -176,6 +198,28 @@ class courseService {
     }
   }
 
+  static async updateCourse(courseId, title, description, image) {
+    try {
+      const course = await Course.findByIdAndUpdate(
+        courseId,
+        {
+          title,
+          description,
+          image,
+        },
+        { new: true }
+      );
+
+      if (!course) {
+        return { success: false, status: 404, message: "Course not found" };
+      }
+
+      return { success: true, course };
+    } catch (error) {
+      throw error;
+    }s
+  }
+
   static async deleteCourse(courseId) {
     try {
       const course = await Course.findByIdAndDelete(courseId);
@@ -187,28 +231,6 @@ class courseService {
       return { success: true, message: "Course deleted successfully" };
     } catch (error) {
       throw error;
-    }
-  }
-
-  static async getEnrolledUsers(courseId) {
-    try {
-      // Step 1: Find the course by its ID and get the enrolledUsers list
-      const course = await Course.findById(courseId).populate(
-        "enrolledUsers",
-        "name email avatar"
-      );
-
-      if (!course) {
-        return { success: false, status: 404, message: "Course not found" };
-      }
-
-      // Step 2: Return the list of enrolled users
-      const enrolledUsers = course.enrolledUsers;
-
-      return { success: true, data: enrolledUsers };
-    } catch (error) {
-      console.error("Error fetching enrolled users:", error);
-      throw new Error("Failed to fetch enrolled users");
     }
   }
 }
