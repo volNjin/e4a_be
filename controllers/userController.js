@@ -43,7 +43,7 @@ const getAll = async (req, res) => {
     };
 
     const requestingUser = req.user; // Lấy user từ middleware
-    console.log(requestingUser)
+    console.log(requestingUser);
     let query = {};
 
     if (requestingUser.role === "admin") {
@@ -94,11 +94,12 @@ const getAll = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const { email, oldPassword, newPassword } = req.body;
+    const email = req.user.email;
+    const { oldPassword, newPassword } = req.body;
 
-    if (!email || !oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword) {
       return res.status(400).json({
-        message: "Vui lòng cung cấp đầy đủ email, mật khẩu cũ và mật khẩu mới.",
+        message: "Vui lòng cung cấp đầy đủ mật khẩu cũ và mật khẩu mới.",
       });
     }
 
@@ -250,9 +251,15 @@ const createUserBatch = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const updateStats = req.body;
-    const updatedUser = await userService.updateUser(userId, updateStats);
-    res.status(200).json({ success: true, updatedUser });
+    const updatedData = req.body;
+    console.log(updatedData)
+    const result = await userService.updateUser(userId, updatedData);
+    if (!result.success) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({ success: true, data: result.updatedUser });
   } catch (error) {
     console.error("Error updating user:", error);
     res

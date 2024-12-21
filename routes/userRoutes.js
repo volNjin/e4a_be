@@ -6,6 +6,7 @@ import {
   changePassword,
   createUser,
   createUserBatch,
+  updateUser,
   deleteUser,
   deleteUserBatch,
   enrollCourse,
@@ -19,10 +20,12 @@ userRoutes.post("/create-user", createUser);
 userRoutes.post("/create-user-batch", createUserBatch);
 userRoutes.delete("/delete-user/:id", deleteUser);
 userRoutes.delete("/delete-user-batch", deleteUserBatch);
+
 userRoutes.get("/info", info);
 userRoutes.get("/get-all", getAll);
 userRoutes.get("/get-user-by-id", getUserById);
 userRoutes.put("/change-password", changePassword);
+userRoutes.put("/update-user", updateUser);
 
 userRoutes.post("/enroll-course/:courseId", enrollCourse);
 export default userRoutes;

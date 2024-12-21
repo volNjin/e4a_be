@@ -139,13 +139,17 @@ export const createUser = async (name, email, role = "student") => {
   }
 };
 
-export const updateUser = async (userId, userStats) => {
+export const updateUser = async (userId, updatedData) => {
   try {
-    const user = await User.findByIdAndUpdate(userId, userStats, { new: true });
-    if (!user) {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updatedData },
+      { new: true } 
+    ).select("-password");
+    if (!updatedUser) {
       return { success: false, status: 404, message: "User not found" };
     }
-    return { success: true, message: "User updated successfully", user };
+    return { success: true, message: "User updated successfully", updatedUser};
   } catch (error) {
     throw error;
   }
