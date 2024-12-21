@@ -2,6 +2,7 @@ import transporter from "../config/nodemailer.js";
 import createUserTemplate from "../utils/createUserTemp.js";
 import changePasswordTemplate from "../utils/changePasswordTemp.js";
 import otpEmailTemp from "../utils/otpEmailTemp.js";
+import resetPasswordTemplate from "../utils/resetPasswordTemp.js";
 class mailService {
   static async sendWelcomeEmail(toEmail, username, password) {
     try {
@@ -48,6 +49,30 @@ class mailService {
       throw new Error("Failed to send email");
     }
   }
+
+  static async sendPasswordResetEmail(toEmail, username, password) {
+    try {
+      const mailOptions = {
+        from: '"E4A Club" <e4aclub@gmail.com>', // Sender address
+        to: toEmail, // Recipient
+        subject: "Your Password has been resetted",
+        html: resetPasswordTemplate(username, toEmail, password), // Gọi hàm tạo nội dung email
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Email sent: %s", info.messageId);
+
+      return {
+        success: true,
+        message: "Email sent successfully",
+        messageId: info.messageId,
+      };
+    } catch (error) {
+      console.error("Error sending email:", error);
+      throw new Error("Failed to send email");
+    }
+  }
+
   static async sendOtpEmail(toEmail, otp) {
     try {
       const mailOptions = {

@@ -130,7 +130,7 @@ export const createUser = async (name, email, role = "student") => {
   }
 };
 
-export const updatedUser = async (userId, userStats) => {
+export const updateUser = async (userId, userStats) => {
   try {
     const user = await User.findByIdAndUpdate(userId, userStats, { new: true });
     if (!user) {
@@ -140,7 +140,6 @@ export const updatedUser = async (userId, userStats) => {
   } catch (error) {
     throw error;
   }
-  ss;
 };
 
 export const deleteUser = async (userId) => {

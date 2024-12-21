@@ -1,6 +1,7 @@
 import * as authService from "../services/authService.js";
 import * as otpService from "../services/otpService.js";
 import mailService from "../services/mailService.js";
+import { generateToken } from "../helpers/randomToken.js";
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -52,20 +53,31 @@ const requestPasswordReset = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, otp, newPassword } = req.body;
+    const { email, otp } = req.body;
 
-    if (!email || !otp || !newPassword) {
-      return res
-        .status(400)
-        .json({ message: "Email, otp and new password are required" });
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email, otp are required" });
     }
     const verificationResult = await otpService.verifyOtp(email, otp);
     if (!verificationResult.success) {
       return res.status(400).json({ message: verificationResult.message });
     }
     try {
-      const message = await authService.resetPassword(email, newPassword);
-
+      const newPassword = generateToken();
+      const result = await authService.resetPassword(email, newPassword);
+      if (!result.success) {
+        return res.status(400).json({ message: result.message });
+      }
+      try {
+        await mailService.sendPasswordResetEmail(
+          result.updatedUser.email,
+          result.updatedUser.name,
+          newPassword
+        );
+        console.log(`Reset password email sent successfully to ${email}`);
+      } catch (emailError) {
+        console.error(`Error sending reset password email to ${email}:`, emailError);
+      }
       res
         .status(200)
         .json({ success: true, message: "Password reset successfully" });
