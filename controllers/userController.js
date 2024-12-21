@@ -2,6 +2,7 @@ import * as userService from "../services/userService.js";
 import mailService from "../services/mailService.js";
 import courseService from "../services/courseService.js";
 import * as progressService from "../services/progressService.js";
+
 const info = async (req, res) => {
   try {
     const result = await userService.info(req.user.id);
@@ -124,7 +125,9 @@ const changePassword = async (req, res) => {
       console.error("Error sending change password notification:", emailError);
       // Optional: You can choose to continue, log it, or notify an admin
     }
-    res.status(200).json({ message: "Change password successfully!" });
+    res
+      .status(200)
+      .json({ success: true, message: "Change password successfully!" });
   } catch (error) {
     console.error("Failed to change password:", error);
     res
@@ -252,7 +255,7 @@ const updateUser = async (req, res) => {
   try {
     const userId = req.user?.id;
     const updatedData = req.body;
-    console.log(updatedData)
+    console.log(updatedData);
     const result = await userService.updateUser(userId, updatedData);
     if (!result.success) {
       return res
@@ -265,6 +268,30 @@ const updateUser = async (req, res) => {
     res
       .status(404)
       .json({ success: false, message: "Internal server error", error });
+  }
+};
+
+export const uploadImage = async (req, res) => {
+  try {
+    console.log(req);
+    const userId = req.user?.id;
+    const file = req.file; // Extract the uploaded file from the request
+    const result = await userService.uploadImageToCloudinary(userId, file);
+    if (!result.success) {
+      return res.status(404).json({ success: false, message: result.message });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Image uploaded successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

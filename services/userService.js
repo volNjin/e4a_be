@@ -2,6 +2,9 @@ import User from "../models/User.js";
 import Course from "../models/Course.js";
 import { getInfoData } from "../utils/index.js";
 import bcrypt from "bcryptjs";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
+
 import { generateToken } from "../helpers/randomToken.js";
 
 const select = ["name", "email", "avatar", "createdAt"];
@@ -144,17 +147,49 @@ export const updateUser = async (userId, updatedData) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updatedData },
-      { new: true } 
+      { new: true }
     ).select("-password");
     if (!updatedUser) {
       return { success: false, status: 404, message: "User not found" };
     }
-    return { success: true, message: "User updated successfully", updatedUser};
+    return { success: true, message: "User updated successfully", updatedUser };
   } catch (error) {
     throw error;
   }
 };
 
+export const uploadImageToCloudinary = async (userId, file) => {
+  try {
+    if (!file) {
+      return { success: false, message: "File not found" };
+    }
+
+    // Upload the file to Cloudinary
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: "user_images", // Cloudinary folder
+    });
+
+    // Delete the file from the local file system
+    fs.unlinkSync(file.path);
+
+    const user = await User.findByIdAndUpdate(userId, {
+      avatar: result.secure_url,
+    });
+
+    if (!user) {
+      return { success: false, status: 404, message: "User not found" };
+    }
+
+    return {
+      success: true,
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+  } catch (error) {
+    console.error(error.message);
+    throw new Error("Failed to upload image");
+  }
+};
 export const deleteUser = async (userId) => {
   try {
     const user = await User.findByIdAndDelete(userId);
