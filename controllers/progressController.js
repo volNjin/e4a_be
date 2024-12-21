@@ -6,7 +6,7 @@ export const getProgress = async (req, res) => {
     const progress = await progressService.getProgress(user);
     res.status(200).json({ success: true, data: progress });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -22,6 +22,6 @@ export const markComplete = async (req, res) => {
     }
     res.status(201).json({ success: true, message: result.message });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
