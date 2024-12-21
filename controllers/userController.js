@@ -1,6 +1,7 @@
 import * as userService from "../services/userService.js";
 import mailService from "../services/mailService.js";
 import courseService from "../services/courseService.js";
+import * as progressService from "../services/progressService.js";
 const info = async (req, res) => {
   try {
     const result = await userService.info(req.user.id);
@@ -35,7 +36,6 @@ const getUserById = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     // Lấy filters từ query parameters
-    console.log(req.query);
     const filters = {
       name: req.query?.name,
       email: req.query?.email,
@@ -43,7 +43,7 @@ const getAll = async (req, res) => {
     };
 
     const requestingUser = req.user; // Lấy user từ middleware
-    console.log(requestingUser);
+    console.log(requestingUser)
     let query = {};
 
     if (requestingUser.role === "admin") {
@@ -52,14 +52,16 @@ const getAll = async (req, res) => {
         ...filters,
       };
     } else if (requestingUser.role === "teacher") {
-      const courses = await courseService.getMyCourses(requestingUser);
-      const courseIds = courses.map((course) => course._id);
-      // Teacher chỉ xem student trong các khóa học của họ
-      query = {
-        role: "student",
-        "enrolledCourses.courseId": { $in: courseIds },
-        ...filters,
-      };
+      query = { role: "student", ...filters };
+      if (!filters.courseId) {
+        const courses = await courseService.getMyCourses(requestingUser);
+        const courseIds = courses.map((course) => course._id);
+        // Teacher chỉ xem student trong các khóa học của họ
+        query = {
+          courseIds: courseIds,
+          ...filters,
+        };
+      }
     } else {
       // Các role khác không được phép truy cập
       return res.status(400).json({

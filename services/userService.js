@@ -38,6 +38,10 @@ export const getAllUsers = async (filters) => {
     if (filters.courseId) {
       query["enrolledCourses.courseId"] = filters.courseId; // Tìm kiếm theo courseId
     }
+
+    if (filters.courseIds) {
+      query["enrolledCourses.courseId"] = { $in: filters.courseIds }; // Tìm kiếm theo courseIds
+    }
     // Truy vấn với populate để lấy thông tin khóa học
     const users = await User.find(query).select("-password");
 

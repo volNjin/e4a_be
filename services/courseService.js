@@ -59,12 +59,12 @@ class courseService {
   static async getMyCourses(user) {
     try {
       let matchCondition = {};
+      const userId = new mongoose.Types.ObjectId(user.id);
       if (user.role === "teacher") {
-        matchCondition = { teacher: user.userId }; // Teacher sees only their courses
+        matchCondition = { teacher: userId }; // Teacher sees only their courses
       } else if (user.role === "student") {
-        matchCondition = { enrolledUsers: { $in: [user.userId] } }; // Student sees only enrolled courses
+        matchCondition = { enrolledUsers: userId }; // Student sees only enrolled courses
       }
-
       const courses = await Course.aggregate([
         { $match: matchCondition },
         {
