@@ -100,6 +100,7 @@ const changePassword = async (req, res) => {
 
     if (!oldPassword || !newPassword) {
       return res.status(400).json({
+        success: false,
         message: "Vui lòng cung cấp đầy đủ mật khẩu cũ và mật khẩu mới.",
       });
     }
