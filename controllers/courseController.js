@@ -9,6 +9,16 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
+export const getAllCoursesWithCheckEnrolled = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const courses = await courseService.getAllCoursesWithCheckEnrolled(userId);
+    res.status(200).json({ success: true, data: courses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 export const getMyCourses = async (req, res) => {
   try {
     const user = req.user;

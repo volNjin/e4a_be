@@ -5,56 +5,61 @@ import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
 
 class courseService {
+  static async courseAggregate(matchCondition) {
+    const courses = await Course.aggregate([
+      { $match: matchCondition },
+      {
+        $lookup: {
+          from: "sections",
+          localField: "sections",
+          foreignField: "_id",
+          as: "sections",
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // Lookup for enrolled users
+          localField: "enrolledUsers",
+          foreignField: "_id",
+          as: "enrolledUsers",
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // Lookup for teacher information
+          localField: "teacher",
+          foreignField: "_id",
+          as: "teacherInfo", // Join teacher's information
+        },
+      },
+      {
+        $addFields: {
+          totalSections: { $size: "$sections" },
+          totalEnrolledUsers: { $size: "$enrolledUsers" },
+          teacher: { $arrayElemAt: ["$teacherInfo.name", 0] }, // Get only teacher's name
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          image: 1,
+          teacher: 1, // Now the teacher field contains only the name
+          totalSections: 1,
+          enrolledUsers: { _id: 1, name: 1 },
+          totalEnrolledUsers: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    ]);
+
+    return courses;
+  }
   // 1️⃣ Get a list of all courses
   static async getAllCourses() {
     try {
-      const courses = await Course.aggregate([
-        {
-          $lookup: {
-            from: "sections",
-            localField: "sections",
-            foreignField: "_id",
-            as: "sections",
-          },
-        },
-        {
-          $lookup: {
-            from: "users", // Lookup for enrolled users
-            localField: "enrolledUsers",
-            foreignField: "_id",
-            as: "enrolledUsers",
-          },
-        },
-        {
-          $lookup: {
-            from: "users", // Lookup for teacher information
-            localField: "teacher",
-            foreignField: "_id",
-            as: "teacherInfo", // Join teacher's information
-          },
-        },
-        {
-          $addFields: {
-            totalSections: { $size: "$sections" },
-            totalEnrolledUsers: { $size: "$enrolledUsers" },
-            teacher: { $arrayElemAt: ["$teacherInfo.name", 0] }, // Get only teacher's name
-          },
-        },
-        {
-          $project: {
-            title: 1,
-            description: 1,
-            image: 1,
-            teacher: 1, // Now the teacher field contains only the name
-            totalSections: 1,
-            totalEnrolledUsers: 1,
-            createdAt: 1,
-            updatedAt: 1,
-          },
-        },
-      ]);
-
-      return courses;
+      return await this.courseAggregate({});
     } catch (error) {
       console.error("Error getting all courses: ", error);
       throw new Error("Failed to get courses with stats");
@@ -69,57 +74,28 @@ class courseService {
       } else if (user.role === "student") {
         matchCondition = { enrolledUsers: userId }; // Student sees only enrolled courses
       }
-      const courses = await Course.aggregate([
-        { $match: matchCondition },
-        {
-          $lookup: {
-            from: "sections",
-            localField: "sections",
-            foreignField: "_id",
-            as: "sections",
-          },
-        },
-        {
-          $lookup: {
-            from: "users", // Lookup for enrolled users
-            localField: "enrolledUsers",
-            foreignField: "_id",
-            as: "enrolledUsers",
-          },
-        },
-        {
-          $lookup: {
-            from: "users", // Lookup for teacher information
-            localField: "teacher",
-            foreignField: "_id",
-            as: "teacherInfo", // Join teacher's information
-          },
-        },
-        {
-          $addFields: {
-            totalSections: { $size: "$sections" },
-            totalEnrolledUsers: { $size: "$enrolledUsers" },
-            teacher: { $arrayElemAt: ["$teacherInfo.name", 0] }, // Get only teacher's name
-          },
-        },
-        {
-          $project: {
-            title: 1,
-            description: 1,
-            image: 1,
-            teacher: 1, // Now the teacher field contains only the name
-            totalSections: 1,
-            totalEnrolledUsers: 1,
-            createdAt: 1,
-            updatedAt: 1,
-          },
-        },
-      ]);
-
-      return courses;
+      return await this.courseAggregate(matchCondition);
     } catch (error) {
       console.error("Error getting all courses: ", error);
       throw new Error("Failed to get courses with stats");
+    }
+  }
+
+  static async getAllCoursesWithCheckEnrolled(userId) {
+    try {
+      const allCourses = await this.courseAggregate({});
+      const updatedCourses = allCourses.map((course) => {
+        const isEnrolled = course.enrolledUsers.some(
+          (user) => user._id.toString() === userId
+        );
+        return {
+          ...course,
+          isEnrolled,
+        };
+      });
+      return updatedCourses;
+    } catch (error) {
+      throw error;
     }
   }
 
