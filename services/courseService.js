@@ -44,6 +44,7 @@ class courseService {
           $project: {
             title: 1,
             description: 1,
+            image: 1,
             teacher: 1, // Now the teacher field contains only the name
             totalSections: 1,
             totalEnrolledUsers: 1,
@@ -105,6 +106,7 @@ class courseService {
           $project: {
             title: 1,
             description: 1,
+            image: 1,
             teacher: 1, // Now the teacher field contains only the name
             totalSections: 1,
             totalEnrolledUsers: 1,
@@ -157,16 +159,16 @@ class courseService {
     }
   }
 
-  static async uploadImageToCloudinary (file){
+  static async uploadImageToCloudinary(file) {
     try {
       // Upload the file to Cloudinary
       const result = await cloudinary.uploader.upload(file.path, {
         folder: "course_thumbnails", // Cloudinary folder
       });
-  
+
       // Delete the file from the local file system
       fs.unlinkSync(file.path);
-  
+
       return {
         success: true,
         url: result.secure_url,
@@ -176,12 +178,11 @@ class courseService {
       console.error(error.message);
       throw new Error("Failed to upload image");
     }
-  };
+  }
 
   // 3️⃣ Create a new course
   static async createCourse(title, description, image, teacherId) {
     try {
-      
       const teacherObjectId = new mongoose.Types.ObjectId(teacherId);
 
       // Check if the course already exists
@@ -203,7 +204,7 @@ class courseService {
       const newCourse = new Course({
         title,
         description,
-        image : uploadedImage.url,
+        image: uploadedImage.url,
         teacher: teacherObjectId,
         sections: [], // Default empty sections
         enrolledUsers: [], // Default empty enrolled users
@@ -235,7 +236,8 @@ class courseService {
       return { success: true, course };
     } catch (error) {
       throw error;
-    }s
+    }
+    s;
   }
 
   static async deleteCourse(courseId) {
