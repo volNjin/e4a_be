@@ -1,6 +1,9 @@
 import Course from "../models/Course.js";
 import mongoose from "mongoose";
 import Section from "../models/Section.js";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
+
 class courseService {
   // 1️⃣ Get a list of all courses
   static async getAllCourses() {
@@ -154,17 +157,31 @@ class courseService {
     }
   }
 
+  static async uploadImageToCloudinary (file){
+    try {
+      // Upload the file to Cloudinary
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "course_thumbnails", // Cloudinary folder
+      });
+  
+      // Delete the file from the local file system
+      fs.unlinkSync(file.path);
+  
+      return {
+        success: true,
+        url: result.secure_url,
+        public_id: result.public_id,
+      };
+    } catch (error) {
+      console.error(error.message);
+      throw new Error("Failed to upload image");
+    }
+  };
+
   // 3️⃣ Create a new course
   static async createCourse(title, description, image, teacherId) {
     try {
-      // Check for required fields
-      if (!title || !description || !teacherId) {
-        return {
-          success: false,
-          status: 400,
-          message: "All fields are required",
-        };
-      }
+      
       const teacherObjectId = new mongoose.Types.ObjectId(teacherId);
 
       // Check if the course already exists
@@ -181,11 +198,12 @@ class courseService {
           message: "Course already created",
         };
       }
+      const uploadedImage = await this.uploadImageToCloudinary(image);
       // Create and save new course
       const newCourse = new Course({
         title,
         description,
-        image,
+        image : uploadedImage.url,
         teacher: teacherObjectId,
         sections: [], // Default empty sections
         enrolledUsers: [], // Default empty enrolled users

@@ -1,29 +1,52 @@
 import multer from "multer";
 import path from "path";
+import fs from "fs/promises"; // For creating directories dynamically
 
-// Configure Multer storage (temporary)
+// Dynamic storage configuration
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Temporary folder for uploads
+  destination: async (req, file, cb) => {
+    try {
+      let uploadPath;
+
+      // Determine folder based on route
+      if (req.baseUrl.includes("/user")) {
+        uploadPath = "uploads/user";
+      } else if (req.baseUrl.includes("/course")) {
+        uploadPath = "uploads/course";
+      } else if (req.baseUrl.includes("/post")) {
+        uploadPath = "uploads/post";
+      } else {
+        return cb(new Error("Invalid upload route"));
+      }
+      await fs.mkdir(uploadPath, { recursive: true }); // Ensure directory exists
+      cb(null, uploadPath);
+    } catch (error) {
+      cb(error, null);
+    }
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const timestamp = Date.now();
+    const originalName = file.originalname.replace(/\s+/g, "_"); // Replace spaces with underscores
+    cb(null, `${timestamp}-${originalName}`);
   },
 });
 
-// Filter to accept only image files
+// File filter for image types
 const fileFilter = (req, file, cb) => {
-  const fileTypes = /jpeg|jpg|png|gif/;
-  const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = fileTypes.test(file.mimetype);
+  const allowedFileTypes = /jpeg|jpg|png|gif/;
+  const isExtensionValid = allowedFileTypes.test(
+    path.extname(file.originalname).toLowerCase()
+  );
+  const isMimeTypeValid = allowedFileTypes.test(file.mimetype);
 
-  if (extname && mimetype) {
-    return cb(null, true);
+  if (isExtensionValid && isMimeTypeValid) {
+    cb(null, true);
   } else {
     cb(new Error("Only image files are allowed!"));
   }
 };
 
+// Multer middleware
 const upload = multer({ storage, fileFilter });
 
 export default upload;

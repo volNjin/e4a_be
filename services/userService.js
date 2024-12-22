@@ -160,10 +160,6 @@ export const updateUser = async (userId, updatedData) => {
 
 export const uploadImageToCloudinary = async (userId, file) => {
   try {
-    if (!file) {
-      return { success: false, message: "File not found" };
-    }
-
     // Upload the file to Cloudinary
     const result = await cloudinary.uploader.upload(file.path, {
       folder: "user_images", // Cloudinary folder
@@ -172,9 +168,11 @@ export const uploadImageToCloudinary = async (userId, file) => {
     // Delete the file from the local file system
     fs.unlinkSync(file.path);
 
-    const user = await User.findByIdAndUpdate(userId, {
-      avatar: result.secure_url,
-    });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { avatar: result.secure_url },
+      { new: true }
+    );
 
     if (!user) {
       return { success: false, status: 404, message: "User not found" };

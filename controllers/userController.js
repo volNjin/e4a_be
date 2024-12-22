@@ -273,9 +273,11 @@ const updateUser = async (req, res) => {
 
 export const uploadImage = async (req, res) => {
   try {
-    console.log(req);
     const userId = req.user?.id;
     const file = req.file; // Extract the uploaded file from the request
+    if (!file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
     const result = await userService.uploadImageToCloudinary(userId, file);
     if (!result.success) {
       return res.status(404).json({ success: false, message: result.message });

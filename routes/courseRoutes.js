@@ -9,7 +9,7 @@ import {
   deleteCourse,
 } from "../controllers/courseController.js";
 import authenticate from "../middlewares/authMiddleware.js";
-
+import upload from "../config/multer.js";
 const courseRoutes = express.Router();
 courseRoutes.use(authenticate);
 // GET /api/courses - Get all courses
@@ -24,7 +24,7 @@ courseRoutes.get("/:id", getCourseById);
 courseRoutes.get("/enroll-users/:courseId", getEnrolledUsers);
 
 // POST /api/courses - Create a new course
-courseRoutes.post("/", createCourse);
+courseRoutes.post("/", upload.single("image"), createCourse);
 
 courseRoutes.put("/:courseId", updateCourse);
 
