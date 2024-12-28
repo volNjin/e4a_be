@@ -51,6 +51,7 @@ import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import sectionRoutes from "./routes/sectionRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import ckRouter from "./routes/ckEditorRoute.js";
 dotenv.config(); // Load environment variables
 
 const app = express();
@@ -78,6 +79,7 @@ const connectDB = async () => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/ck-editor", ckRouter);
 app.use("/api/user", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/sections", sectionRoutes);
