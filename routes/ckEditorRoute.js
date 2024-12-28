@@ -8,6 +8,7 @@ ckRouter.post("/", (req, res) => {
   uploadMiddleware(req, res, (err) => {
     console.log(req.body);
     if (err) {
+      console.error("Upload error:", err.message); // Log chi tiết lỗi
       return res.status(400).json({
         error: err.message || "File upload failed",
       });
@@ -21,8 +22,9 @@ ckRouter.post("/", (req, res) => {
     }
 
     // Thành công
+    console.log("File uploaded:", req.file);
     res.status(200).json({
-      url: `/uploads/ck-editor/${req.file.filename}`, // Đường dẫn file đã upload
+      url: `/ck-editor/${req.file.filename}`, // Đường dẫn file đã upload
     });
   });
 });

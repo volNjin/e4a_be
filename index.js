@@ -44,6 +44,8 @@
 //   console.log(`Server running on port ${PORT}`);
 // });
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -55,6 +57,8 @@ import ckRouter from "./routes/ckEditorRoute.js";
 dotenv.config(); // Load environment variables
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(express.json()); // Parse JSON requests
@@ -66,6 +70,9 @@ app.use(
     credentials: true, // Cho phép gửi cookie hoặc thông tin xác thực (nếu cần)
   })
 );
+
+// public upload files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Database Connection
 const connectDB = async () => {
   try {
