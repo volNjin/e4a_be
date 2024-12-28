@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       let uploadPath;
-
       // Determine folder based on route
       if (req.baseUrl.includes("/user")) {
         uploadPath = "uploads/user";
@@ -15,6 +14,8 @@ const storage = multer.diskStorage({
         uploadPath = "uploads/course";
       } else if (req.baseUrl.includes("/post")) {
         uploadPath = "uploads/post";
+      } else if (req.baseUrl.includes("/ck-editor")) {
+        uploadPath = "uploads/ck-editor";
       } else {
         return cb(new Error("Invalid upload route"));
       }
