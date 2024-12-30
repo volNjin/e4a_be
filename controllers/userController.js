@@ -55,7 +55,7 @@ const getAll = async (req, res) => {
     } else if (requestingUser.role === "teacher") {
       query = { role: "student", ...filters };
       if (!filters.courseId) {
-        const courses = await courseService.getMyCourses(requestingUser);
+        const courses = await courseService.getCoursesByUser(requestingUser);
         const courseIds = courses.map((course) => course._id);
         // Teacher chỉ xem student trong các khóa học của họ
         query = {

@@ -1,9 +1,9 @@
 import Course from "../models/Course.js";
 import mongoose from "mongoose";
 import Section from "../models/Section.js";
-import cloudinary from "../config/cloudinary.js";
-import fs from "fs";
+import cloudinaryService from "./cloudinaryService.js";
 
+const imageFolder = "course-thumbnails";
 class courseService {
   static async courseAggregate(matchCondition) {
     const courses = await Course.aggregate([
@@ -65,7 +65,7 @@ class courseService {
       throw new Error("Failed to get courses with stats");
     }
   }
-  static async getMyCourses(user) {
+  static async getCoursesByUser(user) {
     try {
       let matchCondition = {};
       const userId = new mongoose.Types.ObjectId(user.id);
@@ -135,26 +135,7 @@ class courseService {
     }
   }
 
-  static async uploadImageToCloudinary(file) {
-    try {
-      // Upload the file to Cloudinary
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: "course_thumbnails", // Cloudinary folder
-      });
 
-      // Delete the file from the local file system
-      fs.unlinkSync(file.path);
-
-      return {
-        success: true,
-        url: result.secure_url,
-        public_id: result.public_id,
-      };
-    } catch (error) {
-      console.error(error.message);
-      throw new Error("Failed to upload image");
-    }
-  }
 
   // 3️⃣ Create a new course
   static async createCourse(title, description, image, teacherId) {
@@ -175,7 +156,7 @@ class courseService {
           message: "Course already created",
         };
       }
-      const uploadedImage = await this.uploadImageToCloudinary(image);
+      const uploadedImage = await cloudinaryService.uploadImageToCloudinary(image, imageFolder);
       // Create and save new course
       const newCourse = new Course({
         title,
@@ -195,15 +176,20 @@ class courseService {
 
   static async updateCourse(courseId, title, description, image) {
     try {
-      const course = await Course.findByIdAndUpdate(
-        courseId,
-        {
-          title,
-          description,
-          image,
-        },
-        { new: true }
-      );
+      const course = await Course.findById(courseId);
+      if (!course) {
+        return { success: false, status: 404, message: "Course not found" };
+      }
+      if (course.image) {
+        await cloudinaryService.deleteImageFromCloudinary(course.image);
+      }
+
+      const uploadedImage = await cloudinaryService.uploadImageToCloudinary(image, imageFolder);
+      // Update the course
+      course.title = title;
+      course.description = description;
+      course.image = uploadedImage.url;
+      await course.save();
 
       if (!course) {
         return { success: false, status: 404, message: "Course not found" };
@@ -219,11 +205,16 @@ class courseService {
   static async deleteCourse(courseId) {
     try {
       const course = await Course.findByIdAndDelete(courseId);
+      await cloudinaryService.deleteImageFromCloudinary(course.image);
       if (!course) {
         return { success: false, status: 404, message: "Course not found" };
       }
       await Section.deleteMany({ course: courseId });
-
+      // Remove this course from users' `enrolledCourses` array
+      await User.updateMany(
+        { enrolledCourses: courseId },
+        { $pull: { enrolledCourses: courseId } }
+      );
       return { success: true, message: "Course deleted successfully" };
     } catch (error) {
       throw error;

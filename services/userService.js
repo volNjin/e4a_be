@@ -1,13 +1,12 @@
+import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import Course from "../models/Course.js";
 import { getInfoData } from "../utils/index.js";
-import bcrypt from "bcryptjs";
-import cloudinary from "../config/cloudinary.js";
-import fs from "fs";
-
 import { generateToken } from "../helpers/randomToken.js";
+import cloudinaryService from "./cloudinaryService.js";
 
 const select = ["name", "email", "avatar", "createdAt"];
+const imageFolder = "avatars";
 export const info = async (id) => {
   try {
     const user = await User.findById(id);
@@ -161,16 +160,11 @@ export const updateUser = async (userId, updatedData) => {
 export const uploadImageToCloudinary = async (userId, file) => {
   try {
     // Upload the file to Cloudinary
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: "user_images", // Cloudinary folder
-    });
-
-    // Delete the file from the local file system
-    fs.unlinkSync(file.path);
+    const result = await cloudinaryService.uploadImageToCloudinary(file, imageFolder);
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { avatar: result.secure_url },
+      { avatar: result.url },
       { new: true }
     );
 

@@ -27,7 +27,7 @@ courseRoutes.get("/enroll-users/:courseId", getEnrolledUsers);
 // POST /api/courses - Create a new course
 courseRoutes.post("/", upload.single("image"), createCourse);
 
-courseRoutes.put("/:courseId", updateCourse);
+courseRoutes.put("/:courseId", upload.single("image"), updateCourse);
 
 courseRoutes.delete("/:id", deleteCourse);
 

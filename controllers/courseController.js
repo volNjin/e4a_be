@@ -22,7 +22,7 @@ export const getAllCoursesWithCheckEnrolled = async (req, res) => {
 export const getMyCourses = async (req, res) => {
   try {
     const user = req.user;
-    const courses = await courseService.getMyCourses(user);
+    const courses = await courseService.getCoursesByUser(user);
     res.status(200).json({ success: true, data: courses });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -86,7 +86,8 @@ export const createCourse = async (req, res) => {
 export const updateCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { title, description, image } = req.body;
+    const { title, description } = req.body;
+    const image = req.file;
     const result = await courseService.updateCourse(
       courseId,
       title,
