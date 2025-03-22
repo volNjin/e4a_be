@@ -54,7 +54,7 @@ const ProgressSchema = new mongoose.Schema(
       ref: "Section",
     },
     lastAccessedAt: {
-      type: Date, // Lần cuối truy cập vào khóa học
+      type: Date, 
       default: Date.now,
     },
     createdAt: {

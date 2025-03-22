@@ -2,11 +2,28 @@ import mongoose from "mongoose";
 
 const SubmissionSchema = new mongoose.Schema(
   {
-    student: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Học viên thực hiện bài tập
-    exercise: { type: mongoose.Schema.Types.ObjectId, ref: "Exercise" }, // Bài tập mà học viên nộp
-    content: { type: String }, // Nội dung trả lời của học viên
-    score: { type: Number }, // Điểm số học viên đạt được
-    teacherComment: { type: String }, // Nhận xét của giáo viên về bài làm
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    exercise: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Exercise",
+      required: true,
+    },
+    answers: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+    },
+    score: {
+      type: Number,
+      default: null,
+    },
+    feedback: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

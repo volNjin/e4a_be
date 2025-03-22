@@ -12,8 +12,7 @@ const sectionService = {
         .limit(1); // Get only the section with the highest order
       return lastSection ? lastSection.order + 1 : 1;
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: error.message });
+      throw error;
     }
   },
 

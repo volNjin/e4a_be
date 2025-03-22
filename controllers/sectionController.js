@@ -7,7 +7,7 @@ export const addSection = async (req, res) => {
   if (!title || !courseId) {
     return res
       .status(400)
-      .json({ message: "Title, courseId, and order are required" });
+      .json({success: false, message: "Title, courseId, and order are required" });
   }
   const nextSectionOrder = await sectionService.getNextSectionOrder(courseId);
 
@@ -62,6 +62,7 @@ export const getSection = async (req, res) => {
     if (!data) {
       return res.status(404).json({ success: false, message: "Section not found" });
     }
+    
     return res.status(200).json({ success: true, data });
   } catch (error) {
     console.error(error);
@@ -75,6 +76,7 @@ export const updateSection = async (req, res) => {
 
   if (!title && !content && !order && !video) {
     return res.status(400).json({
+      success: false,
       message:
         "At least one field (title, content, order, video) is required for update",
     });

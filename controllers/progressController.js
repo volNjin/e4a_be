@@ -1,27 +1,65 @@
-import progressService from "../services/progressService.js";
+import * as ProgressService from "../services/progressService.js";
 
-export const getProgress = async (req, res) => {
-  try {
-    const user = req.user;
-    const progress = await progressService.getProgress(user);
-    res.status(200).json({ success: true, data: progress });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const markComplete = async (req, res) => {
-  try {
-    const { courseId } = req.params;
-    const user = req.user;
-    const result = await progressService.markComplete(user, courseId);
-    if (!result.success) {
-      return res
-        .status(result.status)
-        .json({ success: false, message: result.message });
+class ProgressController {
+  async getProgress(req, res) {
+    try {
+      const { userId, courseId } = req.params;
+      const progress = await ProgressService.getProgress(userId, courseId);
+      if (!progress) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Progress not found" });
+      }
+      res.status(200).json({ success: true, progress });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
     }
-    res.status(201).json({ success: true, message: result.message });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
   }
-};
+
+  async initProgress(req, res) {
+    try {
+      const { userId, courseId } = req.params;
+      const progress = await ProgressService.initProgress(userId, courseId);
+      if (!progress.success) {
+        return res.status(400).json({ success: false, message: progress.message });
+      }
+      res.status(201).json({ success: true, progress });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async updateProgressOnExerciseSubmission(req, res) {
+    try {
+      const { userId, courseId, exerciseId } = req.params;
+      const { status, score, feedback } = req.body;
+      const progress = await ProgressService.updateProgressOnExerciseSubmission(
+        userId,
+        courseId,
+        exerciseId,
+        status,
+        score,
+        feedback
+      );
+      res.status(200).json({ success: true, progress });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async updateProgressOnSectionCompletion(req, res) {
+    try {
+      const { userId, courseId, sectionId } = req.params;
+      const progress = await ProgressService.updateProgressOnSectionCompletion(
+        userId,
+        courseId,
+        sectionId
+      );
+      res.status(200).json({ success: true, progress });
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+}
+
+export default new ProgressController();
