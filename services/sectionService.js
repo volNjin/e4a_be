@@ -68,7 +68,10 @@ const sectionService = {
     try {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
       const section = await Section.findOne({ course: courseObjectId, order });
-      return section;
+      if (!section) {
+        return { success: false, message: "Section not found" };
+      }
+      return { success: true, section: section };
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch section");
@@ -95,26 +98,15 @@ const sectionService = {
 
       // 🟢 4. Trả về thông tin section và tổng số section của khóa học
       return {
-        section,
-        totalSections,
+        success: true,
+        section: section,
+        totalSections: totalSections,
       };
     } catch (error) {
       console.error("Error fetching section: ", error);
       throw new Error("Failed to fetch section");
     }
   },
-
-  // // 3. Lấy tất cả sections con của một section, có phân loại theo thứ tự
-  // async getSectionsByParent(parentId) {
-  //   try {
-  //     const sections = await Section.find({ parent: parentId }).sort({
-  //       order: 1,
-  //     }); // Sắp xếp theo thứ tự
-  //     return sections;
-  //   } catch (error) {
-  //     throw new Error("Failed to fetch sections");
-  //   }
-  // },
 
   // 4. Cập nhật một section
   async updateSection(sectionId, title, content, order, video) {
@@ -150,7 +142,7 @@ const sectionService = {
         { new: true }
       );
 
-      return updatedSection;
+      return {success: true, updatedSection: updatedSection};
     } catch (error) {
       console.log(error);
       throw new Error("Failed to update section");

@@ -1,3 +1,4 @@
+import Progress from "../models/Progress.js";
 import sectionService from "../services/sectionService.js";
 
 // 1. Thêm một section mới
@@ -22,7 +23,7 @@ export const addSection = async (req, res) => {
     return res.status(201).json({ success: true, section: newSection });
   } catch (error) {
     console.error(error);
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -35,7 +36,7 @@ export const getSectionsByCourse = async (req, res) => {
     return res.status(200).json({ success: true, sections });
   } catch (error) {
     console.error(error);
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -50,7 +51,7 @@ export const getSectionByCourseAndOrder = async (req, res) => {
     return res.status(200).json({ success: true, section });
   } catch (error) {
     console.error(error);
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -59,14 +60,14 @@ export const getSection = async (req, res) => {
 
   try {
     const data = await sectionService.getSection(sectionId);
-    if (!data) {
+    if (!data.success) {
       return res.status(404).json({ success: false, message: "Section not found" });
     }
     
-    return res.status(200).json({ success: true, data });
+    return res.status(200).json({ success: true, section: data.section, totalSections: data.totalSections });
   } catch (error) {
     console.error(error);
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 // 3. Cập nhật thông tin của một section
@@ -98,7 +99,7 @@ export const updateSection = async (req, res) => {
     return res.status(200).json({ success: true, section: updatedSection });
   } catch (error) {
     console.error(error);
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -116,6 +117,6 @@ export const deleteSection = async (req, res) => {
     return res.status(200).json({ success: true, message: "Section deleted" });
   } catch (error) {
     console.error(error);
-    return res.status(404).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
