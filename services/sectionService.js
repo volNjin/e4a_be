@@ -71,7 +71,7 @@ const sectionService = {
       if (!section) {
         return { success: false, message: "Section not found" };
       }
-      return { success: true, section: section };
+      return section;
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch section");
@@ -90,7 +90,7 @@ const sectionService = {
         return { success: false, message: "Section not found" };
       }
 
-      // 🟢 2. Lấy ID của khóa học
+      // 🟢 2. Lấy ID của khóa học3
       const courseId = section.course._id;
 
       // 🟢 3. Đếm số lượng section trong khóa học
@@ -142,7 +142,7 @@ const sectionService = {
         { new: true }
       );
 
-      return {success: true, updatedSection: updatedSection};
+      return { success: true, updatedSection: updatedSection };
     } catch (error) {
       console.log(error);
       throw new Error("Failed to update section");

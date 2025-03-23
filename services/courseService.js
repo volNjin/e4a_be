@@ -68,6 +68,7 @@ class courseService {
   static async getCoursesByUser(user) {
     try {
       let matchCondition = {};
+      console.log(user.id);
       const userId = new mongoose.Types.ObjectId(user.id);
       if (user.role === "teacher") {
         matchCondition = { teacher: userId }; // Teacher sees only their courses
@@ -135,8 +136,6 @@ class courseService {
     }
   }
 
-
-
   // 3️⃣ Create a new course
   static async createCourse(title, description, image, teacherId) {
     try {
@@ -156,7 +155,10 @@ class courseService {
           message: "Course already created",
         };
       }
-      const uploadedImage = await cloudinaryService.uploadImageToCloudinary(image, imageFolder);
+      const uploadedImage = await cloudinaryService.uploadImageToCloudinary(
+        image,
+        imageFolder
+      );
       // Create and save new course
       const newCourse = new Course({
         title,
@@ -184,7 +186,10 @@ class courseService {
         await cloudinaryService.deleteImageFromCloudinary(course.image);
       }
 
-      const uploadedImage = await cloudinaryService.uploadImageToCloudinary(image, imageFolder);
+      const uploadedImage = await cloudinaryService.uploadImageToCloudinary(
+        image,
+        imageFolder
+      );
       // Update the course
       course.title = title;
       course.description = description;

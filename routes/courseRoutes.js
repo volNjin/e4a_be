@@ -18,7 +18,10 @@ courseRoutes.get("/", getAllCourses);
 
 // GET /api/courses/myCourses - Get all user's courses
 courseRoutes.get("/my-courses", getMyCourses);
-courseRoutes.get("/all-courses-with-check-enrolled", getAllCoursesWithCheckEnrolled)
+courseRoutes.get(
+  "/all-courses-with-check-enrolled",
+  getAllCoursesWithCheckEnrolled
+);
 // GET /api/courses/:id - Get a single course by ID
 courseRoutes.get("/:id", getCourseById);
 

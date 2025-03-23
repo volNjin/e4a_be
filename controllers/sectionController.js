@@ -6,9 +6,10 @@ export const addSection = async (req, res) => {
   const { title, content, courseId, video } = req.body;
 
   if (!title || !courseId) {
-    return res
-      .status(400)
-      .json({success: false, message: "Title, courseId, and order are required" });
+    return res.status(400).json({
+      success: false,
+      message: "Title, courseId, and order are required",
+    });
   }
   const nextSectionOrder = await sectionService.getNextSectionOrder(courseId);
 
@@ -61,10 +62,16 @@ export const getSection = async (req, res) => {
   try {
     const data = await sectionService.getSection(sectionId);
     if (!data.success) {
-      return res.status(404).json({ success: false, message: "Section not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Section not found" });
     }
-    
-    return res.status(200).json({ success: true, section: data.section, totalSections: data.totalSections });
+
+    return res.status(200).json({
+      success: true,
+      section: data.section,
+      totalSections: data.totalSections,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: error.message });
