@@ -45,11 +45,20 @@ export const getSectionByCourseAndOrder = async (req, res) => {
   const { courseId, order } = req.body;
 
   try {
-    const section = await sectionService.getSectionByCourseAndOrder(
+    const result = await sectionService.getSectionByCourseAndOrder(
       courseId,
       order
     );
-    return res.status(200).json({ success: true, section });
+    if (!result.success) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Section not found" });
+    }
+    if (req.user.role === "student") {
+      const userId = req.user._id;
+      await updateProgressOnSectionCompletion(userId, courseId, section._id);
+    }
+    return res.status(200).json({ success: true, section: result.section });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: error.message });

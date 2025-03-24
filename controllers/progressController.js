@@ -31,7 +31,8 @@ class ProgressController {
 
   async updateProgressOnExerciseSubmission(req, res) {
     try {
-      const { userId, courseId, exerciseId } = req.params;
+      const userId = req.user.id;
+      const { courseId, exerciseId } = req.params;
       const { status, score, feedback } = req.body;
       const progress = await ProgressService.updateProgressOnExerciseSubmission(
         userId,
@@ -40,20 +41,6 @@ class ProgressController {
         status,
         score,
         feedback
-      );
-      res.status(200).json({ success: true, progress });
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-
-  async updateProgressOnSectionCompletion(req, res) {
-    try {
-      const { userId, courseId, sectionId } = req.params;
-      const progress = await ProgressService.updateProgressOnSectionCompletion(
-        userId,
-        courseId,
-        sectionId
       );
       res.status(200).json({ success: true, progress });
     } catch (error) {

@@ -2,7 +2,8 @@ import * as SubmissionService from "../services/submissionService.js";
 
 export const createSubmission = async (req, res) => {
   try {
-    const submissionData = req.body;
+    const userId = req.user.id;
+    const submissionData = { ...req.body, userId };
     const result = await SubmissionService.createSubmission(submissionData);
     res.status(201).json(result);
   } catch (error) {

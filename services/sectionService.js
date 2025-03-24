@@ -1,6 +1,7 @@
 import Section from "../models/Section.js";
 import Course from "../models/Course.js";
 import mongoose from "mongoose";
+import { markLastAccessedSection, updateProgressOnSectionCompletion } from "./progressService.js";
 const sectionService = {
   async getNextSectionOrder(courseId) {
     try {
@@ -64,14 +65,14 @@ const sectionService = {
     }
   },
 
-  async getSectionByCourseAndOrder(courseId, order) {
+  async getSectionByCourseAndOrder(userId, courseId, order) {
     try {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
       const section = await Section.findOne({ course: courseObjectId, order });
       if (!section) {
         return { success: false, message: "Section not found" };
       }
-      return section;
+      return {success: true, section: section};
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch section");

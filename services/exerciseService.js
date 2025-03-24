@@ -4,6 +4,16 @@ import Section from "../models/Section.js";
 
 export const createExercise = async (exerciseData) => {
   try {
+    if (exerciseData.type === "choice") {
+      const trueOptionsCount = exerciseData.options.filter(
+        (option) => option.isCorrect
+      ).length;
+      if (trueOptionsCount >= 2) {
+        exerciseData.type = "multiple-choice";
+      } else {
+        exerciseData.type = "single-choice";
+      }
+    }
     const exercise = new Exercise(exerciseData);
     await exercise.save();
     await Section.findByIdAndUpdate(exercise.sectionId, {

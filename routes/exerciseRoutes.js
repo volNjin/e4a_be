@@ -10,6 +10,6 @@ router.get("/:exerciseId", ExerciseController.getExerciseById);
 router.put("/:exerciseId", ExerciseController.updateExercise);
 router.delete("/:exerciseId", ExerciseController.deleteExercise);
 router.get("/", ExerciseController.getAllExercises);
-router.get("/bySection/:sectionId", ExerciseController.getExercisesBySection);
+router.get("/by-section/:sectionId", ExerciseController.getExercisesBySection);
 
 export default router;
