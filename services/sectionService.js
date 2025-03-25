@@ -1,7 +1,7 @@
 import Section from "../models/Section.js";
 import Course from "../models/Course.js";
 import mongoose from "mongoose";
-import { markLastAccessedSection, updateProgressOnSectionCompletion } from "./progressService.js";
+import Progress from "../models/Progress.js";
 const sectionService = {
   async getNextSectionOrder(courseId) {
     try {
@@ -49,30 +49,46 @@ const sectionService = {
   },
 
   // 2. Lấy tất cả sections của một course, có phân loại theo thứ tự
-  async getSectionsByCourse(courseId) {
+  async getSectionsByCourse(userId, courseId) {
     try {
-      const courseObjectId = new mongoose.Types.ObjectId(courseId);
       const sections = await Section.find(
-        { course: courseObjectId },
+        { course: courseId },
         { _id: 1, title: 1, order: 1 }
       ).sort({
         order: 1,
       }); // Sắp xếp theo thứ tự
-      return sections;
+      const progress = await Progress.findOne({
+        userId,
+        courseId,
+      });
+      const completedSectionIds =
+        progress?.sections.map(
+          (section) => section.sectionId.toString() // Extract `sectionId` and convert to string
+        ) || [];
+
+      console.log(completedSectionIds);
+      const sectionsWithStatus = sections.map((section) => {
+        const isComplete = completedSectionIds.includes(section._id.toString());
+        return {
+          ...section.toObject(),
+          status: isComplete ? "completed" : "not-completed",
+        };
+      });
+      return sectionsWithStatus;
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch sections");
     }
   },
 
-  async getSectionByCourseAndOrder(userId, courseId, order) {
+  async getSectionByCourseAndOrder(courseId, order) {
     try {
       const courseObjectId = new mongoose.Types.ObjectId(courseId);
       const section = await Section.findOne({ course: courseObjectId, order });
       if (!section) {
         return { success: false, message: "Section not found" };
       }
-      return {success: true, section: section};
+      return { success: true, section: section };
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch section");

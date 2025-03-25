@@ -33,7 +33,8 @@ export const getSectionsByCourse = async (req, res) => {
   const { courseId } = req.params;
 
   try {
-    const sections = await sectionService.getSectionsByCourse(courseId);
+    const userId = req.user.id;
+    const sections = await sectionService.getSectionsByCourse(userId, courseId);
     return res.status(200).json({ success: true, sections });
   } catch (error) {
     console.error(error);

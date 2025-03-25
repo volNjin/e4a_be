@@ -16,18 +16,18 @@ class ProgressController {
     }
   }
 
-  async initProgress(req, res) {
-    try {
-      const { userId, courseId } = req.params;
-      const progress = await ProgressService.initProgress(userId, courseId);
-      if (!progress.success) {
-        return res.status(400).json({ success: false, message: progress.message });
-      }
-      res.status(201).json({ success: true, progress });
-    } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
-    }
-  }
+  // async initProgress(req, res) {
+  //   try {
+  //     const { userId, courseId } = req.params;
+  //     const progress = await ProgressService.initProgress(userId, courseId);
+  //     if (!progress.success) {
+  //       return res.status(400).json({ success: false, message: progress.message });
+  //     }
+  //     res.status(201).json({ success: true, progress });
+  //   } catch (error) {
+  //     res.status(400).json({ success: false, message: error.message });
+  //   }
+  // }
 
   async updateProgressOnExerciseSubmission(req, res) {
     try {
