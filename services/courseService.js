@@ -210,7 +210,7 @@ class courseService {
 
   static async deleteCourse(courseId) {
     try {
-      const course = await Course.findByIdAndDelete(courseId);
+      const course = await Course.findById(courseId);
       if (!course) {
         return { success: false, status: 404, message: "Course not found" };
       }
@@ -221,6 +221,10 @@ class courseService {
         { enrolledCourses: courseId },
         { $pull: { enrolledCourses: courseId } }
       );
+      const result = await Course.findByIdAndDelete(courseId);
+      if (!result) {
+        return { success: false, status: 400, message: "Failed to delete course" };
+      }
       return { success: true, message: "Course deleted successfully" };
     } catch (error) {
       throw error;
