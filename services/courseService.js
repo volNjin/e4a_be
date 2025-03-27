@@ -1,4 +1,5 @@
 import Course from "../models/Course.js";
+import User from "../models/User.js";
 import mongoose from "mongoose";
 import Section from "../models/Section.js";
 import cloudinaryService from "./cloudinaryService.js";
@@ -210,10 +211,10 @@ class courseService {
   static async deleteCourse(courseId) {
     try {
       const course = await Course.findByIdAndDelete(courseId);
-      await cloudinaryService.deleteImageFromCloudinary(course.image);
       if (!course) {
         return { success: false, status: 404, message: "Course not found" };
       }
+      await cloudinaryService.deleteImageFromCloudinary(course.image);
       await Section.deleteMany({ course: courseId });
       // Remove this course from users' `enrolledCourses` array
       await User.updateMany(
