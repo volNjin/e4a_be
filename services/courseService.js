@@ -210,7 +210,8 @@ class courseService {
 
   static async deleteCourse(courseId) {
     try {
-      const course = await Course.findById(courseId);
+      const courseObjectId = new mongoose.Types.ObjectId(courseId);
+      const course = await Course.findById(courseObjectId);
       if (!course) {
         return { success: false, status: 404, message: "Course not found" };
       }
@@ -221,7 +222,7 @@ class courseService {
         { enrolledCourses: courseId },
         { $pull: { enrolledCourses: courseId } }
       );
-      const result = await Course.findByIdAndDelete(courseId);
+      const result = await Course.findByIdAndDelete(courseObjectId);
       if (!result) {
         return { success: false, status: 400, message: "Failed to delete course" };
       }

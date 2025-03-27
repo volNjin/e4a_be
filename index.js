@@ -12,6 +12,7 @@ import ckRouter from "./routes/ckEditorRoute.js";
 import progressRoutes from "./routes/progressRoutes.js";
 import exerciseRoutes from "./routes/exerciseRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
+import translatorRoutes from "./routes/translatorRoutes.js";
 dotenv.config(); // Load environment variables
 
 const app = express();
@@ -51,7 +52,7 @@ app.use("/api/sections", sectionRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/submissions", submissionRoutes);
-
+app.use("/api/translate", translatorRoutes);
 // Default Route
 app.get("/", (req, res) => {
   res.send("Welcome to the API");
