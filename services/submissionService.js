@@ -16,7 +16,6 @@ export const createSubmission = async (submissionData) => {
     if (!exerciseDoc) {
       throw new Error("Exercise not found");
     }
-
     let score = null;
     if (exerciseDoc.type === "speaking") {
       score = clientScore;
@@ -53,10 +52,8 @@ const calculateScore = (exercise, answers) => {
       score = (answers === correctAnswer) ? 100 : 0;
       break;
     case "fill-in-the-blank":
-      const correctBlanks = exercise.correctAnswers;
-      const userBlanks = Array.isArray(answers) ? answers : [answers];
-      const correctBlanksCount = userBlanks.filter(answer => correctBlanks.includes(answer)).length;
-      score = (correctBlanksCount / correctBlanks.length) * 100;
+      const correctBlank = exercise.blankAnswer;
+      score = (answers === correctBlank) ? 100 : 0;
       break;
     default:
       throw new Error("Unknown exercise type");

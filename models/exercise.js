@@ -24,9 +24,26 @@ const ExerciseSchema = new mongoose.Schema(
         isCorrect: { type: Boolean, default: false },
       },
     ],
-    correctAnswers: [{ type: mongoose.Schema.Types.Mixed }],
+    blankAnswer: { type: String },
   },
   { timestamps: true }
 );
+
+// Custom validation for `options` and `blankAnswer`
+ExerciseSchema.pre("validate", function (next) {
+  if (this.type === "multiple-choice" || this.type === "single-choice") {
+    if (!this.options || this.options.length === 0) {
+      return next(new Error("Options are required for choice-based questions."));
+    }
+  }
+
+  if (this.type === "fill-in-the-blank") {
+    if (!this.blankAnswer || this.blankAnswer.trim() === "") {
+      return next(new Error("Blank answer is required for fill-in-the-blank questions."));
+    }
+  }
+
+  next();
+});
 
 export default mongoose.model("Exercise", ExerciseSchema);

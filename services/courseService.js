@@ -69,7 +69,6 @@ class courseService {
   static async getCoursesByUser(user) {
     try {
       let matchCondition = {};
-      console.log(user.id);
       const userId = new mongoose.Types.ObjectId(user.id);
       if (user.role === "teacher") {
         matchCondition = { teacher: userId }; // Teacher sees only their courses
