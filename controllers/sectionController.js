@@ -1,5 +1,5 @@
-import Progress from "../models/Progress.js";
 import sectionService from "../services/sectionService.js";
+import { updateProgressOnSectionCompletion } from "../services/progressService.js";
 
 // 1. Thêm một section mới
 export const addSection = async (req, res) => {
