@@ -4,6 +4,7 @@ import Course from "../models/Course.js";
 import { getInfoData } from "../utils/index.js";
 import { generateToken } from "../helpers/randomToken.js";
 import cloudinaryService from "./cloudinaryService.js";
+import * as progressService from "./progressService.js";
 
 const select = ["name", "email", "avatar", "createdAt"];
 const imageFolder = "avatars";
@@ -20,6 +21,37 @@ export const info = async (id) => {
           fields: select,
           object: user,
         }),
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUser = async (userId) => {
+  try {
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return { success: false, status: 404, message: "User not found" };
+    }
+    const progress = await progressService.getAllProgress(userId);
+    const detailedProgress = await Promise.all(
+      progress.map(async (item) => {
+        const course = await Course.findById(item.courseId).select("title");
+        return {
+          courseName: course ? course.title : "Unknown Course", 
+          ...item._doc, 
+        };
+      })
+    );
+    return {
+      success: true,
+      data: {
+        user: getInfoData({
+          fields: select,
+          object: user,
+        }),
+        progress: detailedProgress,
       },
     };
   } catch (error) {

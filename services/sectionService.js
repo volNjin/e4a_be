@@ -68,10 +68,10 @@ const sectionService = {
 
       console.log(completedSectionIds);
       const sectionsWithStatus = sections.map((section) => {
-        const isComplete = completedSectionIds.includes(section._id.toString());
+        const isCompleted = completedSectionIds.includes(section._id.toString());
         return {
           ...section.toObject(),
-          status: isComplete ? "completed" : "not-completed",
+          isCompleted: isCompleted
         };
       });
       return sectionsWithStatus;

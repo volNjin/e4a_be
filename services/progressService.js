@@ -4,13 +4,22 @@ import Course from "../models/Course.js";
 import Section from "../models/Section.js";
 import Exercise from "../models/exercise.js";
 
+export const getAllProgress = async (userId) => {
+  try {
+    const progress = await Progress.find({ userId });
+    return progress;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getProgress = async (userId, courseId) => {
   try {
     const progress = await Progress.findOne({ userId, courseId });
     if (!progress) {
       return { success: false, message: "Progress not found" };
     }
-    return progress;
+    return {success: true, progress: progress};
   } catch (error) {
     throw error;
   }
