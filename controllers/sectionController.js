@@ -56,7 +56,7 @@ export const getSectionByCourseAndOrder = async (req, res) => {
         .json({ success: false, message: "Section not found" });
     }
     if (req.user.role === "student") {
-      const userId = req.user._id;
+      const userId = req.user.id;
       await updateProgressOnSectionCompletion(userId, courseId, result.section._id);
     }
     return res.status(200).json({ success: true, section: result.section });

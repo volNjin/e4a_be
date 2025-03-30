@@ -1,5 +1,5 @@
 import courseService from "../services/courseService.js";
-
+import * as userService from "../services/userService.js";
 export const getAllCourses = async (req, res) => {
   try {
     const courses = await courseService.getAllCourses();
@@ -13,6 +13,17 @@ export const getAllCoursesWithCheckEnrolled = async (req, res) => {
   try {
     const userId = req.user?.id;
     const courses = await courseService.getAllCoursesWithCheckEnrolled(userId);
+    res.status(200).json({ success: true, data: courses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getCoursesByUser = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const user = await userService.getUser(id);
+    const courses = await courseService.getCoursesByUser(user);
     res.status(200).json({ success: true, data: courses });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

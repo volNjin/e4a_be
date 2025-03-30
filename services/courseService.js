@@ -2,7 +2,9 @@ import Course from "../models/Course.js";
 import User from "../models/User.js";
 import mongoose from "mongoose";
 import Section from "../models/Section.js";
+import Progress from "../models/Progress.js";
 import cloudinaryService from "./cloudinaryService.js";
+import * as progressService from "./progressService.js";
 
 const imageFolder = "course-thumbnails";
 class courseService {
@@ -75,7 +77,27 @@ class courseService {
       } else if (user.role === "student") {
         matchCondition = { enrolledUsers: userId }; // Student sees only enrolled courses
       }
-      return await this.courseAggregate(matchCondition);
+      const courses = await this.courseAggregate(matchCondition);
+
+      // If the user is a student, fetch progress and attach it to the courses
+      if (user.role === "student") {
+        const userProgress = await Progress.find({ userId }).lean();
+
+        const coursesWithProgress = courses.map((course) => {
+          const progressForCourse = userProgress.find(
+            (progress) => progress.courseId.toString() === course._id.toString()
+          );
+
+          return {
+            ...course,
+            progress: progressForCourse.progress || null, 
+          };
+        });
+
+        return coursesWithProgress;
+      }
+
+      return courses;
     } catch (error) {
       console.error("Error getting all courses: ", error);
       throw new Error("Failed to get courses with stats");
@@ -85,15 +107,46 @@ class courseService {
   static async getAllCoursesWithCheckEnrolled(userId) {
     try {
       const allCourses = await this.courseAggregate({});
-      const updatedCourses = allCourses.map((course) => {
-        const isEnrolled = course.enrolledUsers.some(
-          (user) => user._id.toString() === userId
-        );
-        return {
-          ...course,
-          isEnrolled,
-        };
-      });
+
+      // Fetch the user's progress
+      const userProgress = await progressService.getAllProgress(userId);
+
+      const updatedCourses = await Promise.all(
+        allCourses.map(async (course) => {
+          const isEnrolled = course.enrolledUsers.some(
+            (user) => user._id.toString() === userId
+          );
+
+          // Find the progress for this course
+          const progressForCourse = userProgress.find(
+            (progress) => progress.courseId.toString() === course._id.toString()
+          );
+
+          // Fetch the name of the last accessed section if progress exists
+          let lastAccessedSectionName = null;
+          if (
+            isEnrolled &&
+            progressForCourse &&
+            progressForCourse.lastAccessedSection
+          ) {
+            const section = await Section.findById(
+              progressForCourse.lastAccessedSection
+            ).select("title");
+            lastAccessedSectionName = section ? section.title : null;
+            return {
+              ...course,
+              isEnrolled: true,
+              lastAccessedSection: lastAccessedSectionName,
+            };
+          }
+
+          return {
+            ...course,
+            isEnrolled: false,
+          };
+        })
+      );
+
       return updatedCourses;
     } catch (error) {
       throw error;
@@ -223,7 +276,11 @@ class courseService {
       );
       const result = await Course.findByIdAndDelete(courseObjectId);
       if (!result) {
-        return { success: false, status: 400, message: "Failed to delete course" };
+        return {
+          success: false,
+          status: 400,
+          message: "Failed to delete course",
+        };
       }
       return { success: true, message: "Course deleted successfully" };
     } catch (error) {

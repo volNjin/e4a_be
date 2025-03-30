@@ -44,7 +44,6 @@ const getAll = async (req, res) => {
     };
 
     const requestingUser = req.user; // Lấy user từ middleware
-    console.log(requestingUser);
     let query = {};
 
     if (requestingUser.role === "admin") {

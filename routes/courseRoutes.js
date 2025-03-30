@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllCourses,
+  getCoursesByUser,
   getMyCourses,
   getCourseById,
   getEnrolledUsers,
@@ -16,7 +17,7 @@ courseRoutes.use(authenticate);
 // GET /api/courses - Get all courses
 courseRoutes.get("/", getAllCourses);
 
-// GET /api/courses/myCourses - Get all user's courses
+courseRoutes.get("/user/:id", getCoursesByUser);
 courseRoutes.get("/my-courses", getMyCourses);
 courseRoutes.get(
   "/all-courses-with-check-enrolled",

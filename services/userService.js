@@ -6,7 +6,7 @@ import { generateToken } from "../helpers/randomToken.js";
 import cloudinaryService from "./cloudinaryService.js";
 import * as progressService from "./progressService.js";
 
-const select = ["name", "email", "avatar", "createdAt"];
+const select = ["name", "role", "email", "avatar", "createdAt"];
 const imageFolder = "avatars";
 export const info = async (id) => {
   try {
@@ -39,8 +39,8 @@ export const getUser = async (userId) => {
       progress.map(async (item) => {
         const course = await Course.findById(item.courseId).select("title");
         return {
-          courseName: course ? course.title : "Unknown Course", 
-          ...item._doc, 
+          courseName: course ? course.title : "Unknown Course",
+          ...item._doc,
         };
       })
     );
@@ -192,7 +192,10 @@ export const updateUser = async (userId, updatedData) => {
 export const uploadImageToCloudinary = async (userId, file) => {
   try {
     // Upload the file to Cloudinary
-    const result = await cloudinaryService.uploadImageToCloudinary(file, imageFolder);
+    const result = await cloudinaryService.uploadImageToCloudinary(
+      file,
+      imageFolder
+    );
 
     const user = await User.findByIdAndUpdate(
       userId,
