@@ -27,26 +27,6 @@ export const info = async (id) => {
   }
 };
 
-export const getUser = async (userId) => {
-  try {
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      return { success: false, status: 404, message: "User not found" };
-    }
-    return {
-      success: true,
-      data: {
-        user: getInfoData({
-          fields: select,
-          object: user,
-        }),
-      },
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const getAllUsers = async (filters) => {
   try {
     // Tạo query từ filters
