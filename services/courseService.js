@@ -69,6 +69,7 @@ class courseService {
     }
   }
   static async getCoursesByUser(user) {
+    console.log(user);
     try {
       let matchCondition = {};
       const userId = new mongoose.Types.ObjectId(user.id);
