@@ -6,6 +6,5 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/:courseId", ProgressController.getProgress);
-router.put("/:courseId/exercise/:exerciseId", ProgressController.updateProgressOnExerciseSubmission);
 
 export default router;

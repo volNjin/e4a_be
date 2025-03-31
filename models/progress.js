@@ -34,17 +34,8 @@ const ProgressSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "Exercise",
         },
-        status: {
-          type: String,
-          enum: ["not-started", "in-progress", "completed"],
-          default: "not-started",
-        },
         score: {
           type: Number,
-          default: null,
-        },
-        feedback: {
-          type: String,
           default: null,
         },
       },
@@ -54,7 +45,7 @@ const ProgressSchema = new mongoose.Schema(
       ref: "Section",
     },
     lastAccessedAt: {
-      type: Date, 
+      type: Date,
       default: Date.now,
     },
     createdAt: {

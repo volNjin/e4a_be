@@ -11,7 +11,7 @@ export const getAllProgress = async (userId) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 export const getProgress = async (userId, courseId) => {
   try {
@@ -19,7 +19,7 @@ export const getProgress = async (userId, courseId) => {
     if (!progress) {
       return { success: false, message: "Progress not found" };
     }
-    return {success: true, progress: progress};
+    return { success: true, progress: progress };
   } catch (error) {
     throw error;
   }
@@ -55,31 +55,44 @@ export const updateProgressOnExerciseSubmission = async (
   userId,
   courseId,
   exerciseId,
-  status,
-  score,
-  feedback
+  score
 ) => {
   try {
+    // Find the progress document
     const progress = await Progress.findOne({ userId, courseId });
     if (!progress) {
       throw new Error("Progress not found");
     }
 
-    const exercise = progress.exercises.find(
+    // Check if the exercise already exists in the progress
+    const exerciseIndex = progress.exercises.findIndex(
       (ex) => ex.exerciseId.toString() === exerciseId
     );
-    if (exercise) {
-      exercise.status = status;
-      exercise.score = score;
-      exercise.feedback = feedback;
+
+    if (exerciseIndex !== -1) {
+      // Update the score if the exercise exists
+      progress.exercises[exerciseIndex].score = score;
     } else {
-      progress.exercises.push({ exerciseId, status, score, feedback });
+      // Add the exercise to the progress if it doesn't exist
+      progress.exercises.push({ exerciseId, score });
     }
 
+    // Save the updated progress document
     await progress.save();
-    const calculated = await calculateProgress(userId, courseId);
-    return calculated;
+
+    // Recalculate the overall progress
+    try {
+      const calculatedProgress = await calculateProgress(userId, courseId);
+      return calculatedProgress;
+    } catch (error) {
+      console.error("Failed to calculate progress:", error.message);
+      throw new Error("Progress calculation failed");
+    }
   } catch (error) {
+    console.error(
+      "Error updating progress on exercise submission:",
+      error.message
+    );
     throw error;
   }
 };
@@ -90,24 +103,47 @@ export const updateProgressOnSectionCompletion = async (
   sectionId
 ) => {
   try {
+    // Find the progress document
     const progress = await Progress.findOne({ userId, courseId });
     if (!progress) {
       throw new Error("Progress not found");
     }
-
-    const section = progress.sections.find(
-      (sec) => sec.sectionId.toString() === sectionId
+    // Check if the section already exists in the progress
+    const sectionIndex = progress.sections.findIndex(
+      (sec) => sec.sectionId.toString() === sectionId.toString()
     );
-    if (section) {
-      section.completedAt = new Date();
+
+    if (sectionIndex !== -1) {
+      // Update the completedAt timestamp if the section exists
+      progress.sections[sectionIndex].completedAt = new Date();
     } else {
+      // Add the section to the progress if it doesn't exist
       progress.sections.push({ sectionId, completedAt: new Date() });
     }
+
+    // Save the updated progress document
     await progress.save();
-    await markLastAccessedSection(userId, courseId, sectionId);
-    const calculated = await calculateProgress(userId, courseId);
-    return calculated;
+
+    // Update the last accessed section
+    try {
+      await markLastAccessedSection(userId, courseId, sectionId);
+    } catch (error) {
+      console.error("Failed to mark last accessed section:", error.message);
+    }
+
+    // Recalculate the overall progress
+    try {
+      const calculatedProgress = await calculateProgress(userId, courseId);
+      return calculatedProgress;
+    } catch (error) {
+      console.error("Failed to calculate progress:", error.message);
+      throw new Error("Progress calculation failed");
+    }
   } catch (error) {
+    console.error(
+      "Error updating progress on section completion:",
+      error.message
+    );
     throw error;
   }
 };

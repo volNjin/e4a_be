@@ -6,9 +6,12 @@ import { updateProgressOnExerciseSubmission } from "./progressService.js";
 
 export const createSubmission = async (submissionData) => {
   try {
-    const { userId, exercise, answers, score: clientScore } = submissionData;
-    
-    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(exercise)) {
+    const { userId, exercise, score } = submissionData;
+
+    if (
+      !mongoose.Types.ObjectId.isValid(userId) ||
+      !mongoose.Types.ObjectId.isValid(exercise)
+    ) {
       throw new Error("Invalid userId or exerciseId");
     }
 
@@ -16,50 +19,20 @@ export const createSubmission = async (submissionData) => {
     if (!exerciseDoc) {
       throw new Error("Exercise not found");
     }
-    let score = null;
-    if (exerciseDoc.type === "speaking") {
-      score = clientScore;
-    } else {
-      score = calculateScore(exerciseDoc, answers);
-    }
-
-    const submission = new Submission({ ...submissionData, score });
-    await submission.save();
 
     // Update progress after submission
-    const section = await Section.findOne(exerciseDoc.sectionId)
-    await updateProgressOnExerciseSubmission(userId, section.course, exercise, "completed", score, null);
+    const section = await Section.findOne(exerciseDoc.sectionId);
+    await updateProgressOnExerciseSubmission(
+      userId,
+      section.course,
+      exercise,
+      score,
+    );
 
-    return { success: true, submission };
+    return { success: true };
   } catch (error) {
     throw error;
   }
-};
-
-const calculateScore = (exercise, answers) => {
-  let score = 0;
-
-  switch (exercise.type) {
-    case "multiple-choice":
-      const correctAnswers = exercise.options.filter(option => option.isCorrect).map(option => option.text);
-      const userAnswers = Array.isArray(answers) ? answers : [answers];
-      const allCorrect = correctAnswers.every(answer => userAnswers.includes(answer));
-      const noIncorrect = userAnswers.every(answer => correctAnswers.includes(answer));
-      score = (allCorrect && noIncorrect) ? 100 : 0;
-      break;
-    case "single-choice":
-      const correctAnswer = exercise.options.find(option => option.isCorrect)?.text;
-      score = (answers === correctAnswer) ? 100 : 0;
-      break;
-    case "fill-in-the-blank":
-      const correctBlank = exercise.blankAnswer;
-      score = (answers === correctBlank) ? 100 : 0;
-      break;
-    default:
-      throw new Error("Unknown exercise type");
-  }
-
-  return score;
 };
 
 export const getSubmissionById = async (submissionId) => {
@@ -68,7 +41,9 @@ export const getSubmissionById = async (submissionId) => {
       throw new Error("Invalid submissionId");
     }
 
-    const submission = await Submission.findById(submissionId).populate("exercise");
+    const submission = await Submission.findById(submissionId).populate(
+      "exercise"
+    );
     if (!submission) {
       return { success: false, message: "Submission not found" };
     }
@@ -84,7 +59,11 @@ export const updateSubmission = async (submissionId, updateData) => {
       throw new Error("Invalid submissionId");
     }
 
-    const submission = await Submission.findByIdAndUpdate(submissionId, updateData, { new: true });
+    const submission = await Submission.findByIdAndUpdate(
+      submissionId,
+      updateData,
+      { new: true }
+    );
     if (!submission) {
       return { success: false, message: "Submission not found" };
     }
