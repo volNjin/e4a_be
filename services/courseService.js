@@ -268,11 +268,11 @@ class courseService {
         return { success: false, status: 404, message: "Course not found" };
       }
       await cloudinaryService.deleteImageFromCloudinary(course.image);
-      await Section.deleteMany({ course: courseId });
+      await Section.deleteMany({ course: courseObjectId });
       // Remove this course from users' `enrolledCourses` array
       await User.updateMany(
-        { enrolledCourses: courseId },
-        { $pull: { enrolledCourses: courseId } }
+        { enrolledCourses: courseObjectId },
+        { $pull: { enrolledCourses: courseObjectId } }
       );
       const result = await Course.findByIdAndDelete(courseObjectId);
       if (!result) {
