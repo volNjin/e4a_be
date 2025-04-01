@@ -3,7 +3,7 @@ from flask_cors import CORS
 from deep_translator import GoogleTranslator
 from nltk.corpus import wordnet
 import nltk
-
+from waitress import serve
 # Ensure required NLTK data is downloaded
 nltk.download("wordnet")
 nltk.download("omw-1.4")
@@ -93,4 +93,4 @@ def word_info():
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    serve(app, host="0.0.0.0", port=5000)
