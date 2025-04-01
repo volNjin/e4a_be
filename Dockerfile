@@ -20,7 +20,6 @@ RUN apt-get install -y nodejs
 COPY package.json package-lock.json ./
 RUN npm install
 
-COPY public ./public
 COPY config ./config
 COPY utils ./utils
 COPY helpers ./helpers
