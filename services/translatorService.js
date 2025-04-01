@@ -4,7 +4,7 @@ const translatorService = {
   async translateText(text) {
     try {
       // Call LibreTranslate API
-      const response = await axios.post("http://localhost:5000/translate", {
+      const response = await axios.post("http://127.0.0.1:5000/translate", {
         text, // Text to translate or analyze
         target_language: 'vi',
       });

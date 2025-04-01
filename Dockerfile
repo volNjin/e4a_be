@@ -35,4 +35,5 @@ COPY index.js .
 EXPOSE 5000 8080
 
 # Start both Flask and Node.js servers
-CMD ["sh", "-c", "python translator.py & node index.js"]
+CMD ["sh", "-c", "python translator.py & sleep 3 && node index.js"]
+
