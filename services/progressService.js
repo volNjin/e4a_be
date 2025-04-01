@@ -167,13 +167,8 @@ const calculateProgress = async (userId, courseId) => {
       (acc, section) => acc + section.exercises.length,
       0
     );
-    const completedSections = progress.sections.filter(
-      (sec) => sec.completedAt
-    ).length;
-    const completedExercises = progress.exercises.filter(
-      (ex) => ex.status === "completed"
-    ).length;
-
+    const completedSections = progress.sections.length;
+    const completedExercises = progress.exercises.length;
     const totalItems = totalSections + totalExercises;
     const completedItems = completedSections + completedExercises;
 
