@@ -20,6 +20,14 @@ RUN apt-get install -y nodejs
 COPY package.json package-lock.json ./
 RUN npm install
 
+COPY public ./public
+COPY config ./config
+COPY utils ./utils
+COPY helpers ./helpers
+COPY middlewares ./middlewares
+COPY models ./models
+COPY services ./services
+COPY controllers ./controllers
 COPY routes ./routes
 # Copy the Node.js server file
 COPY index.js .
