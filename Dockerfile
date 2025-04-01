@@ -20,6 +20,7 @@ RUN apt-get install -y nodejs
 COPY package.json package-lock.json ./
 RUN npm install
 
+COPY routes ./routes
 # Copy the Node.js server file
 COPY index.js .
 
