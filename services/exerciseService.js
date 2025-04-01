@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Exercise from "../models/exercise.js";
+import Exercise from "../models/Exercise.js";
 import Section from "../models/Section.js";
 
 export const createExercise = async (exerciseData) => {

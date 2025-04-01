@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Submission from "../models/submission.js";
-import Exercise from "../models/exercise.js";
+import Exercise from "../models/Exercise.js";
 import Section from "../models/Section.js";
 import { updateProgressOnExerciseSubmission } from "./progressService.js";
 
