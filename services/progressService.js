@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import Progress from "../models/Progress.js";
 import Course from "../models/Course.js";
-import Section from "../models/Section.js";
-import Exercise from "../models/Exercise.js";
 
 export const getAllProgress = async (userId) => {
   try {
