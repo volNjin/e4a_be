@@ -21,7 +21,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 # Copy Node.js server file
-COPY server.js .
+COPY index.js .
 
 # Expose necessary ports
 EXPOSE 5000 8080
