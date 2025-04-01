@@ -23,8 +23,6 @@
     "morgan": "^1.10.0"
   },
   "scripts": {
-  "start": "concurrently \"npm run start-node\" \"npm run start-python\"",
-  "start-node": "node index.js",
-  "start-python": "python d:/Code/e4a/services/translator.py"
+  "start": "node index.js"
 }
 }
