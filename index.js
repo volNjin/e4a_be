@@ -23,7 +23,6 @@ const __dirname = path.dirname(__filename);
 app.use(express.json()); // Parse JSON requests
 app.use(
   cors({
-    origin: "http://localhost:3000", // Chỉ cho phép frontend React từ localhost:3000
     methods: "GET, POST, PUT, DELETE", // Chỉ định các phương thức được phép
     allowedHeaders: ["Content-Type", "Authorization"], // Chỉ cho phép các header này
     credentials: true, // Cho phép gửi cookie hoặc thông tin xác thực (nếu cần)
@@ -59,7 +58,7 @@ app.get("/", (req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, async () => {
   await connectDB();
   console.log(`Server running on port ${PORT}`);
