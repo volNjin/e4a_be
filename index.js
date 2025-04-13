@@ -19,11 +19,22 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const allowedOrigins = [
+  'https://e4aclub-gamma.vercel.app', // Your frontend URL
+  'http://localhost:3000' // Allow localhost for development
+];
+
 // Middleware
 app.use(express.json()); // Parse JSON requests
 app.use(
   cors({
-    origin: "http://localhost:3000", // Chỉ cho phép frontend React từ localhost:3000
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: "GET, POST, PUT, DELETE", // Chỉ định các phương thức được phép
     allowedHeaders: ["Content-Type", "Authorization"], // Chỉ cho phép các header này
     credentials: true, // Cho phép gửi cookie hoặc thông tin xác thực (nếu cần)
