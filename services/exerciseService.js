@@ -14,6 +14,18 @@ export const createExercise = async (exerciseData) => {
         exerciseData.type = "single-choice";
       }
     }
+    if (exerciseData.type === "conversation") {
+      if (
+        !exerciseData.conversation ||
+        exerciseData.conversation.length === 0
+      ) {
+        return {
+          success: false,
+          message: "Conversation script is required for conversation type.",
+        };
+      }
+      exerciseData.conversation.script = parseConversation(exerciseData.conversation.script);
+    }
     const exercise = new Exercise(exerciseData);
     await exercise.save();
     await Section.findByIdAndUpdate(exercise.sectionId, {
@@ -23,6 +35,30 @@ export const createExercise = async (exerciseData) => {
   } catch (error) {
     throw error;
   }
+};
+
+const parseConversation = (conversationText) => {
+  const lines = conversationText.split("\n"); // Split the text into lines
+  const script = [];
+  let currentSpeaker = null; // Track the current speaker
+
+  lines.forEach((line) => {
+    if (!line.trim()) return; // Skip empty lines
+
+    const [speaker, ...textParts] = line.split(":"); // Split by the first colon
+    if (textParts.length > 0) {
+      // If the line starts with a speaker identifier
+      currentSpeaker = speaker.trim(); // Update the current speaker
+      script.push({
+        speaker: currentSpeaker,
+        text: textParts.join(":").trim(), // Join the remaining parts as the text
+      });
+    } else if (currentSpeaker) {
+      // If the line does not start with a speaker, treat it as a continuation
+      script[script.length - 1].text += ` ${line.trim()}`; // Append to the last speaker's text
+    }
+  });
+  return script;
 };
 
 export const getExerciseById = async (exerciseId) => {

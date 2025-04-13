@@ -47,11 +47,17 @@ def get_word_info(text, target_lang="vi"):
         definition = syn.definition()  # Definition
         examples = syn.examples()  # Usage examples
 
+        try:
+            translator = GoogleTranslator(source="en", target=target_lang)
+            translated_definition = translator.translate(definition)
+        except Exception as e:
+            translated_definition = f"Error during translation: {str(e)}"
+
         if pos not in word_info:
             word_info[pos] = {
                 "synonyms": synonyms,
                 "antonyms": antonyms,
-                "definition": definition,
+                "definition": translated_definition,
                 "examples": examples,
             }
 
@@ -61,14 +67,8 @@ def get_word_info(text, target_lang="vi"):
         k: filtered_word_info[k]
         for k in sorted(filtered_word_info, key=lambda x: pos_order.index(x))
     }
-    # Translate the single word
-    try:
-        translator = GoogleTranslator(source="en", target=target_lang)
-        translated_word = translator.translate(word)
-    except Exception as e:
-        translated_word = f"Error during translation: {str(e)}"
+    
     return {
-        "translated": translated_word,
         "details": sorted_word_info,
     }
 

@@ -4,6 +4,9 @@ export const createExercise = async (req, res) => {
   try {
     const exerciseData = req.body;
     const result = await ExerciseService.createExercise(exerciseData);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

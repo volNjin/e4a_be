@@ -14,17 +14,27 @@ const ExerciseSchema = new mongoose.Schema(
         "single-choice",
         "fill-in-the-blank",
         "speaking",
+        "conversation",
       ],
       required: true,
     },
     question: { type: String, required: true },
     options: [
       {
-        text: { type: String, required: true },
+        text: { type: String },
         isCorrect: { type: Boolean, default: false },
       },
     ],
     blankAnswer: { type: String },
+    conversation: {
+      role: {type: String, required: true}, 
+      script: [
+        {
+          speaker: String, 
+          text: String,
+        },
+      ],
+    },
   },
   { timestamps: true }
 );
