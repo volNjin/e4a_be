@@ -20,8 +20,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const allowedOrigins = [
-  'https://e4aclub-gamma.vercel.app', // Your frontend URL
-  'http://localhost:3000' // Allow localhost for development
+  'https://e4aclub-gamma.vercel.app', 
+  'http://localhost:8080',
+  'http://localhost:3000',
 ];
 
 // Middleware

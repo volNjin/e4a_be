@@ -24,7 +24,30 @@ export const createExercise = async (exerciseData) => {
           message: "Conversation script is required for conversation type.",
         };
       }
-      exerciseData.conversation.script = parseConversation(exerciseData.conversation.script);
+      exerciseData.conversation.script = parseConversation(
+        exerciseData.conversation.script
+      );
+      if (
+        exerciseData.conversation.script.length < 2 ||
+        exerciseData.conversation.script.some(
+          (line) => !line.speaker || !line.text
+        )
+      ) {
+        return {
+          success: false,
+          message:
+            "Conversation script must have at least two lines with speaker and text.",
+        };
+      }
+      const speakers = exerciseData.conversation.script.map((line) =>
+        line.speaker.toLowerCase()
+      );
+      if (!speakers.includes(exerciseData.conversation.role.toLowerCase())) {
+        return {
+          success: false,
+          message: `The role '${exerciseData.conversation.role}' does not match any speaker in the conversation script.`,
+        };
+      }
     }
     const exercise = new Exercise(exerciseData);
     await exercise.save();
