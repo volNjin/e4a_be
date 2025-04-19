@@ -28,7 +28,8 @@ const ExerciseSchema = new mongoose.Schema(
     blankAnswer: { type: String },
     conversation: {
       role: {type: String, required: true}, 
-      script: [
+      script: { type: String, required: true },
+      parsedScript: [
         {
           speaker: String, 
           text: String,
@@ -39,7 +40,6 @@ const ExerciseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Custom validation for `options` and `blankAnswer`
 ExerciseSchema.pre("validate", function (next) {
   if (this.type === "multiple-choice" || this.type === "single-choice") {
     if (!this.options || this.options.length === 0) {

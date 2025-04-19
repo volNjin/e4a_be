@@ -24,12 +24,12 @@ export const createExercise = async (exerciseData) => {
           message: "Conversation script is required for conversation type.",
         };
       }
-      exerciseData.conversation.script = parseConversation(
+      exerciseData.conversation.parsedScript = parseConversation(
         exerciseData.conversation.script
       );
       if (
-        exerciseData.conversation.script.length < 2 ||
-        exerciseData.conversation.script.some(
+        exerciseData.conversation.parsedScript.length < 2 ||
+        exerciseData.conversation.parsedScript.some(
           (line) => !line.speaker || !line.text
         )
       ) {
@@ -39,7 +39,7 @@ export const createExercise = async (exerciseData) => {
             "Conversation script must have at least two lines with speaker and text.",
         };
       }
-      const speakers = exerciseData.conversation.script.map((line) =>
+      const speakers = exerciseData.conversation.parsedScript.map((line) =>
         line.speaker.toLowerCase()
       );
       if (!speakers.includes(exerciseData.conversation.role.toLowerCase())) {
@@ -106,13 +106,52 @@ export const updateExercise = async (exerciseId, updateData) => {
       throw new Error("Invalid exerciseId");
     }
 
-    const exercise = await Exercise.findByIdAndUpdate(exerciseId, updateData, {
-      new: true,
-    });
+    const exercise = await Exercise.findById(exerciseId);
     if (!exercise) {
       return { success: false, message: "Exercise not found" };
     }
-    return { success: true, exercise: exercise };
+    if (updateData.type === "conversation") {
+      if (
+        !updateData.conversation ||
+        updateData.conversation.length === 0
+      ) {
+        return {
+          success: false,
+          message: "Conversation script is required for conversation type.",
+        };
+      }
+      updateData.conversation.parsedScript = parseConversation(
+        updateData.conversation.script
+      );
+      if (
+        updateData.conversation.parsedScript.length < 2 ||
+        updateData.conversation.parsedScript.some(
+          (line) => !line.speaker || !line.text
+        )
+      ) {
+        return {
+          success: false,
+          message:
+            "Conversation script must have at least two lines with speaker and text.",
+        };
+      }
+    }
+    if (updateData.type === "choice") {
+      const trueOptionsCount = updateData.options.filter(
+        (option) => option.isCorrect
+      ).length;
+      if (trueOptionsCount >= 2) {
+        updateData.type = "multiple-choice";
+      } else {
+        updateData.type = "single-choice";
+      }
+    }
+    const updatedExercise = await Exercise.findByIdAndUpdate(
+      exerciseId,
+      updateData,
+      { new: true }
+    );
+    return { success: true, exercise: updatedExercise };
   } catch (error) {
     throw error;
   }
